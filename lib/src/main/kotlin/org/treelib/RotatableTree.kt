@@ -1,19 +1,25 @@
 package org.treelib
 
-interface RotatableTree<K: Comparable<K>, V> {
-  fun rotateLeft(node: Node<K, V>) {
-    requireNotNull(node.right)
+interface RotatableTree<K: Comparable<K>, V : Any> {
+  fun rotateLeft(node: Node<K, V>): Node<K, V> {
     val x = node.right
-    node.right = x.left
-    x.left = node
-    return x
+    x?.let {
+      node.right = x.left
+      x.left = node
+      return x
+    } ?: let {
+      throw NullPointerException("Can't rotate left: right node is null")
+    }
   }
-
-  fun rotateRight(node: Node<K, V>) {
-    requireNotNull(node.left)
+  fun rotateRight(node: Node<K, V>): Node<K, V> {
     val x = node.left
-    node.left = x.right
-    x.right = node
-    return x
+    x?.let {
+      node.left = x.right
+      x.right = node
+      return x
+    } ?: let {
+      throw NullPointerException("Can't rotate right: left node is null")
+    }
+
   }
 }
