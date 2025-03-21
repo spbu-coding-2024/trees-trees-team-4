@@ -10,7 +10,11 @@ class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, dat
     }
 
     override fun max(root: Node<K, V>?): K {
-        TODO("Not yet implemented")
+        var resultNode = root ?: throw NoSuchElementException("Tree is empty")
+        while (resultNode.right != null) {
+            resultNode = resultNode.right!!
+        }
+        return resultNode.key
     }
 
     override fun insert(key: K, value: V): Node<K, V>? {
