@@ -6,16 +6,16 @@ abstract class BinaryTree<K: Comparable<K>, V: Any>(var key: K, var data: V) {
     internal var root: Node<K, V>? = null
     fun min(): K? {
         var resultNode = root ?: return null
-        while (resultNode.left != null) {
-            resultNode = resultNode.left!!
+        while (true) {
+            resultNode = resultNode.left ?: break
         }
         return resultNode.key
     }
 
     fun max(): K? {
         var resultNode = root ?: return null
-        while (resultNode.right != null) {
-            resultNode = resultNode.right!!
+        while (true) {
+            resultNode = resultNode.right ?: break
         }
         return resultNode.key
     }
