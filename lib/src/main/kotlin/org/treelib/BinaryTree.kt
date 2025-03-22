@@ -3,21 +3,21 @@ package org.treelib
 
 
 abstract class BinaryTree<K: Comparable<K>, V: Any>(var key: K, var data: V) {
-    internal var root: Node<K, V>? = null
-    fun min(): K? {
+    internal abstract var root: Node<K, V>?
+    fun min(): Node<K, V>? {
         var resultNode = root ?: return null
         while (true) {
             resultNode = resultNode.left ?: break
         }
-        return resultNode.key
+        return resultNode
     }
 
-    fun max(): K? {
+    fun max(): Node<K, V>? {
         var resultNode = root ?: return null
         while (true) {
             resultNode = resultNode.right ?: break
         }
-        return resultNode.key
+        return resultNode
     }
 
     abstract fun insert(key: K, value: V): Node<K, V>?
