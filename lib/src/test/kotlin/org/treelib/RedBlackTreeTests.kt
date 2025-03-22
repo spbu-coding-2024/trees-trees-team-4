@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.RepeatedTest
-import org.junit.platform.commons.logging.Logger
-import java.lang.annotation.Repeatable
-import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.test.BeforeTest
 
@@ -78,14 +75,6 @@ class RedBlackTreeTests {
     fun `is perfect black balanced 1`() {
         var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
         arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
-//        intTree.insert(10, 1)
-//        intTree.insert(44, 2)
-//        intTree.insert(3, 3)
-//        intTree.insert(88, 4)
-//        intTree.insert(2, 5)
-//        intTree.insert(86, 6)
-//        intTree.insert(20, 7)
-//        intTree.insert(60, 8)
         var bool = check.isBlackBalanced()
         assertEquals(bool, true)
     }
@@ -95,7 +84,6 @@ class RedBlackTreeTests {
         for (i in 1..25) {
             var randomKey = Random.nextInt(0,1000)
             intTree.insert(randomKey, i)
-            println("intTree.insert($randomKey, $i)")
         }
 
         assertEquals(check.isBlackBalanced(), true)
@@ -106,15 +94,14 @@ class RedBlackTreeTests {
         for (i in 1..25) {
             var randomKey = Random.nextInt(0,1000)
             intTree.insert(randomKey, i)
-            println("intTree.insert($randomKey, $i)")
         }
         check.assertRedLinkAreLeaningLeft()
     }
 
     @Test
     fun `search function test 1`() {
-        var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
-        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        var arr = arrayOf(95, 26, 90, 48, 15, 55, 21)
+        arr.forEachIndexed { ind, value -> intTree.insert(value, ind)}
         for (i in 0..(arr.size - 1)) {
             var value = intTree.search(arr[i])?.data
             assertEquals(value, i)
@@ -123,14 +110,14 @@ class RedBlackTreeTests {
 
     @RepeatedTest(10)
     fun `search function test 2`() {
-        var arr = Array<Int>(25) { 0 }
-        for (i in 0..24) {
-            arr[i] = Random.nextInt(0,1000)
-            intTree.insert(arr[i], i)
-            println("intTree.insert(${arr[i]}, $i)")
+        var arr = Array<Int>(8) {
+            Random.nextInt(0, 100)
         }
-        for (i in 0..24) {
-            var value = intTree.search(arr[i])?.data
+        var list = arr.distinct()
+        list.forEachIndexed { ind, value -> intTree.insert(value, ind) }
+
+        for (i in 0..(list.size - 1)) {
+            var value = intTree.search(list[i])?.data
             assertEquals(value, i)
         }
     }
@@ -139,9 +126,27 @@ class RedBlackTreeTests {
     fun `deleteMin 1`() {
         var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
         arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
-        for (i in 1..8) {
+        arr.sort()
+        for (i in 0..(arr.size - 1)) {
             intTree.deleteMin()
-            kotlin.test.assertEquals(intTree.search(arr[i]), null)
+            var node = intTree.search(arr[i])
+            assertEquals(node, null)
+        }
+        assertEquals(intTree.root, null)
+    }
+
+    @Test
+    fun `deleteMin 2`() {
+        var arr = Array<Int>(8) {
+            Random.nextInt(0, 100)
+        }
+        var list = arr.distinct().toTypedArray()
+        list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        list.sort()
+        for (i in 0..(arr.size - 1)) {
+            intTree.deleteMin()
+            var node = intTree.search(list[i])
+            assertEquals(node, null)
         }
         assertEquals(intTree.root, null)
     }
