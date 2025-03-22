@@ -1,5 +1,7 @@
 package org.treelib
 
+class BSTNode<K: Comparable<K>, V: Any>(key: K, data: V) : Node<K, V>(key, data)
+
 class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, data) {
 
     override fun insert(key: K, value: V): Node<K, V>? {
