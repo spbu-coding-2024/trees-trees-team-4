@@ -4,6 +4,8 @@ class BSTNode<K: Comparable<K>, V: Any>(key: K, data: V) : Node<K, V>(key, data)
 
 class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, data) {
 
+    override var root: Node<K, V>? = BSTNode(key, data)
+
     override fun insert(key: K, value: V): Node<K, V>? {
         TODO("Not yet implemented")
     }
