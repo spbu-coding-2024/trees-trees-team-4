@@ -39,7 +39,7 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V>(ke
 		return null
 	}
 
-	private fun insert(key: K, value: V, cur: AVLNode<K, V>): AVLNode<K, V>? {
+	private fun insert(key: K, value: V, cur: AVLNode<K, V>): AVLNode<K, V> {
 		if (key < cur.key) {
 			if (cur.left == null) {
 				cur.left = AVLNode(key, value)
