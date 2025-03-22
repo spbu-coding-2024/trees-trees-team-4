@@ -39,27 +39,25 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V>(ke
 		return null
 	}
 
-	private fun insert(key: K, value: V, root: AVLNode<K, V>): AVLNode<K, V>? {
-		if (key < root.key) {
-			if (root.left == null) {
-				root.left = AVLNode(key, value)
-				updateHeight(root)
-				balance(root)
-				return root.left
-			} else return insert(key, value, root.left)
-		} else if (key == root.key) {
-			root.data = value
-			return root
+	private fun insert(key: K, value: V, cur: AVLNode<K, V>): AVLNode<K, V>? {
+		if (key < cur.key) {
+			if (cur.left == null) {
+				cur.left = AVLNode(key, value)
+				updateHeight(cur)
+				balance(cur)
+				return cur.left
+			} else return insert(key, value, cur.left)
+		} else if (key == cur.key) {
+			cur.data = value
+			return cur
 		} else {
-			if (root.right == null) {
-				root.right = AVLNode(key, value)
-				updateHeight(root)
-				balance(root)
-				return root.right
-			} else return insert(key, data, root.right)
+			if (cur.right == null) {
+				cur.right = AVLNode(key, value)
+				updateHeight(cur)
+				balance(cur)
+				return cur.right
+			} else return insert(key, data, cur.right)
 		}
-
-
 	}
 
 	override fun delete(key: K): AVLNode<K, V>? {
