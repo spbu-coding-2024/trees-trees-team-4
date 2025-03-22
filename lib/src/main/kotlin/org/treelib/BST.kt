@@ -31,7 +31,18 @@ class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, dat
     }
 
     override fun search(key: K): Node<K, V>? {
-        TODO("Not yet implemented")
+        var resultNode: BSTNode<K, V>? = null
+        var currentNode: BSTNode<K, V>? = root as BSTNode<K, V>?
+        while (currentNode?.key != null) {
+            if (currentNode.key > key) {
+                currentNode = (currentNode.left ?: break) as BSTNode<K, V>?
+            } else if (currentNode.key < key) {
+                currentNode = (currentNode.right ?: break) as BSTNode<K, V>?
+            } else {
+                resultNode = currentNode
+            }
+        }
+        return resultNode
     }
 
     override fun delete(key: K): Node<K, V>? {
