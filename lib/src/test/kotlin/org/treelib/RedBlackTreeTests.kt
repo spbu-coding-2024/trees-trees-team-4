@@ -30,6 +30,18 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
             return 1
         }
     }
+    fun assertRedLinkAreLeaningLeft() {
+        assertRedLinkAreLeaningLeft(tree.root)
+    }
+    private fun assertRedLinkAreLeaningLeft(node: RBNode<K, V>?) {
+        node?.let {
+            if (node.rightIsRed()) {
+                throw Exception("Tree with right leaning red link")
+            }
+            assertRedLinkAreLeaningLeft(node.left)
+            assertRedLinkAreLeaningLeft(node.right)
+        }
+    }
 }
 
 class RedBlackTreeTests {
@@ -64,14 +76,16 @@ class RedBlackTreeTests {
 
     @Test
     fun `is perfect black balanced 1`() {
-        intTree.insert(10, 1)
-        intTree.insert(44, 2)
-        intTree.insert(3, 3)
-        intTree.insert(88, 4)
-        intTree.insert(2, 5)
-        intTree.insert(86, 6)
-        intTree.insert(20, 7)
-        intTree.insert(60, 8)
+        var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+//        intTree.insert(10, 1)
+//        intTree.insert(44, 2)
+//        intTree.insert(3, 3)
+//        intTree.insert(88, 4)
+//        intTree.insert(2, 5)
+//        intTree.insert(86, 6)
+//        intTree.insert(20, 7)
+//        intTree.insert(60, 8)
         var bool = check.isBlackBalanced()
         assertEquals(bool, true)
     }
@@ -87,6 +101,48 @@ class RedBlackTreeTests {
         assertEquals(check.isBlackBalanced(), true)
     }
 
+    @RepeatedTest(10)
+    fun `tree is with red leaning links`() {
+        for (i in 1..25) {
+            var randomKey = Random.nextInt(0,1000)
+            intTree.insert(randomKey, i)
+            println("intTree.insert($randomKey, $i)")
+        }
+        check.assertRedLinkAreLeaningLeft()
+    }
 
+    @Test
+    fun `search function test 1`() {
+        var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        for (i in 0..(arr.size - 1)) {
+            var value = intTree.search(arr[i])?.data
+            assertEquals(value, i)
+        }
+    }
 
+    @RepeatedTest(10)
+    fun `search function test 2`() {
+        var arr = Array<Int>(25) { 0 }
+        for (i in 0..24) {
+            arr[i] = Random.nextInt(0,1000)
+            intTree.insert(arr[i], i)
+            println("intTree.insert(${arr[i]}, $i)")
+        }
+        for (i in 0..24) {
+            var value = intTree.search(arr[i])?.data
+            assertEquals(value, i)
+        }
+    }
+
+    @Test
+    fun `deleteMin 1`() {
+        var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        for (i in 1..8) {
+            intTree.deleteMin()
+            kotlin.test.assertEquals(intTree.search(arr[i]), null)
+        }
+        assertEquals(intTree.root, null)
+    }
 }

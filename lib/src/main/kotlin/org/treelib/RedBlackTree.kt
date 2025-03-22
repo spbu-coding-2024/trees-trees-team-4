@@ -114,7 +114,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                 current = current.right
             }
             else if (current.key > key) {
-                current = current.right
+                current = current.left
             }
             else if (current.key == key) {
                 return current
