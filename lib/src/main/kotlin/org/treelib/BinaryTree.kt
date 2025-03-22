@@ -24,5 +24,4 @@ abstract class BinaryTree<K: Comparable<K>, V: Any>(var key: K, var data: V) {
     abstract fun search(key: K): Node<K, V>?
     abstract fun delete(key: K): Node<K, V>?
     abstract fun iterator(key: K): Iterable<Node<K, V>>
-
 }
