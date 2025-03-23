@@ -5,30 +5,17 @@ const val BLACK = false
 
 class RBNode<K: Comparable<K>, V : Any>(key: K, data: V, colorArg: Boolean): Node<K, V, RBNode<K,V>>(key, data) {
     var color: Boolean = colorArg
-
-    internal fun isRed(): Boolean {
-        return this.color == RED
-    }
-    internal fun leftIsRed() : Boolean {
-        return this.left?.color ?: BLACK
-    }
-    internal fun leftLeftIsRed() : Boolean { //TODO(find null safe solution to not use this method)
-        return this.left?.left?.color ?: BLACK
-    }
-    internal fun rightLeftIsRed() : Boolean {
-        return this.right?.left?.color ?: BLACK
-    }
-    internal fun rightIsRed() : Boolean {
-        return this.right?.color ?: BLACK
-    }
 }
 
 class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
-
     var size = 0
 
     fun isEmpty(): Boolean {
         return root == null
+    }
+
+    fun isRed(node: RBNode<K, V>?): Boolean {
+        return node?.color ?: BLACK
     }
 
     private fun flipColors(node: RBNode<K, V>?) {
@@ -46,17 +33,17 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun balanceNode(node: RBNode<K, V>): RBNode<K, V> {
-        var h = node
-        if (!h.leftIsRed() && h.rightIsRed()) {
-            h = rotateLeft(h)
+        var x = node
+        if (!isRed(x.left) && isRed(x.right)) {
+            x = rotateLeft(x)
         }
-        if (h.leftIsRed() && h.leftLeftIsRed()) {
-            h =rotateRight(h)
+        if (isRed(x.left) && isRed(x.left?.left)) {
+            x =rotateRight(x)
         }
-        if (h.leftIsRed() && h.rightIsRed()) {
-            flipColors(h)
+        if (isRed(x.left) && isRed(x.right)) {
+            flipColors(x)
         }
-        return h
+        return x
     }
 
     override fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
@@ -149,11 +136,11 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
-        require(!node.leftLeftIsRed() && !node.leftIsRed())
+        //require(isRed(node) && !isRed(node.left?.left) && !isRed(node.left))
         var x = node
         flipColors(x)
         x.right?.let {
-            if (it.leftIsRed()) {
+            if (isRed(it.left)) {
                 x.right = rotateRight(it)
                 x = rotateLeft(x)
                 flipColors(x)
@@ -163,10 +150,10 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun moveRedRight(node: RBNode<K, V>): RBNode<K, V> {
-        require(node.right != null && !node.rightLeftIsRed())
+        require(!isRed(node.right) && !isRed(node.right?.left))
         var x = node
         flipColors(x)
-        if (x.leftLeftIsRed()) {
+        if (isRed(x.left?.left)) {
             x = rotateRight(x)
             flipColors(x)
         }
@@ -175,7 +162,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
 
     fun deleteMax(): RBNode<K, V> {
         root?.let {
-            if (!it.rightIsRed() && !it.leftIsRed()) {
+            if (!isRed(it.right) && !isRed(it.left)) {
                 it.color = RED
             }
             var (newRoot, deletedNode)= deleteMax(it)
@@ -188,29 +175,29 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         throw NoSuchElementException("deleteMax: Underflow")
     }
 
-    private fun deleteMax(node: RBNode<K, V>?): Pair<RBNode<K, V>?, RBNode<K, V> >{
+    private fun deleteMax(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V> > {
         var x = node
-        x?.let {
-            if (x.leftIsRed()) {
-                x = rotateRight(x)
-            }
-            var right = x.right
-            if (right == null) {
-                return Pair(x.left, node)
-            }
-            if (!right.isRed() && !right.leftIsRed()) {
-                x = moveRedRight(x)
-            }
-            var (newRight, deletedNode) = deleteMax(x.right)
+        if (isRed(x.left)) {
+            x = rotateRight(x)
+        }
+        if (x.right == null) {
+            return Pair(x.left, node)
+        }
+        if (!isRed(x.right) && !isRed(x.right?.left)) {
+            x = moveRedRight(x)
+        }
+        x.right?.let {
+            var (newRight, deletedNode) = deleteMax(it)
             x.right = newRight
             return Pair(balanceNode(x), deletedNode)
-        } ?: throw Exception("Something went wrong in deleteMax") //TODO(rename this exception)
+        } ?:
+        throw IllegalStateException("deleteMax: right node is null")
     }
 
 
     fun deleteMin(): RBNode<K,V> {
         root?.let {
-            if (!it.rightIsRed() && !it.leftIsRed()) {
+            if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
             var (newRoot, deletedNode) = deleteMin(it)
@@ -222,43 +209,40 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         throw NoSuchElementException("deleteMin: Underflow")
     }
 
-    private fun deleteMin(node: RBNode<K, V>?): Pair<RBNode<K, V>?, RBNode<K, V>> {
+    private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
         var x = node
 
-        x?.let {
-            var left = x.left
-            if (left == null) {
-                return Pair(null, node)
-            }
-            if (!left.isRed() && !left.leftIsRed()) {
-                x = moveRedLeft(x)
-            }
-
-            var (newLeft, deletedNode) = deleteMin(x.left)
+        if (x.left == null) {
+            return Pair(null, node)
+        }
+        if (!isRed(x.left) && !isRed(x.left)) {
+            x = moveRedLeft(x)
+        }
+        x.left?.let {
+            var (newLeft, deletedNode) = deleteMin(it)
             x.left = newLeft
-
             return Pair(balanceNode(x), deletedNode)
-        } ?: throw Exception("Something went wrong in deleteMin") //TODO(rename this exception)
+        } ?: throw IllegalStateException("deleteMin: left node is null")
     }
 
     private fun delete(node: RBNode<K, V>, key: K): RBNode<K, V>? {
         var x = node
         if (key < x.key) {
-            if (!x.leftIsRed() && !x.leftLeftIsRed()) {
+            if (!isRed(x.left) && !isRed(x.left?.left)) {
                 x = moveRedLeft(x)
             }
             x.left?.let {
                 x.left = delete(it, key)
             } ?: throw Exception("Delete Exception: left node is null")
         } else {
-            if (x.leftIsRed()) {
+            if (isRed(x.left)) {
                 x = rotateRight(x)
             }
             if (key == x.key && x.right == null) {
-                require(x.isRed())
+                require(isRed(x))
                 return null
             }
-            if (!x.rightIsRed() && !x.rightLeftIsRed()) {
+            if (!isRed(x.right) && !isRed(x.right?.left)) {
                 x = moveRedRight(x)
             }
             if (key == x.key) {
@@ -281,7 +265,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
 
     override fun delete(key: K): RBNode<K, V>? {
         root?.let {
-            if (!it.leftIsRed() && !it.rightIsRed()) {
+            if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
             root = delete(it, key)

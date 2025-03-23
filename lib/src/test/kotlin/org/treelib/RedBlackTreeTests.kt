@@ -36,7 +36,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     }
     private fun assertRedLinkAreLeaningLeft(node: RBNode<K, V>?) {
         node?.let {
-            if (node.rightIsRed()) {
+            if (tree.isRed(node.right)) {
                 throw Exception("Invariant failed: tree is with right leaning red link")
             }
             assertRedLinkAreLeaningLeft(node.left)
@@ -138,23 +138,6 @@ class RedBlackTreePropertyBasedTests {
             assertEquals(node, null)
         }
         assertEquals(randomTree.root, null)
-    }
-
-    @Test
-    fun `DeleteMax Test Copy`() {
-        var arr = arrayOf(48, 50, 73, 6, 27, 35, 3,12, 2, 1)
-        var tree = RedBlackTree<Int, Int>()
-        var localCheck = RBTreeInvariantCheck<Int, Int>(tree)
-        arr.forEachIndexed { ind, value -> tree.insert(value, ind) }
-        arr.sort()
-
-        for (i in (arr.size - 1) downTo 0) {
-            localCheck.checkAll()
-            tree.deleteMax()
-            var node = tree.search(arr[i])
-            println(i)
-        }
-        assertEquals(tree.root, null)
     }
 
     @RepeatedTest(20)
