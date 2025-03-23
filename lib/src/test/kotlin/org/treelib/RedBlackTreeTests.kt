@@ -185,4 +185,49 @@ class RedBlackTreeTests {
         }
         assertEquals(intTree.root, null)
     }
+    @Test
+    fun `delete 1`() {
+        var arr = arrayOf(1,2,3)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        intTree.delete(1)
+        var node = intTree.search(1)
+        assertEquals(node, null)
+    }
+    @Test
+    fun `delete 2`() {
+        var arr = arrayOf(1,2,3,4)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+
+        intTree.delete(2)
+        var node1 = intTree.search(2)
+        assertEquals(node1, null)
+
+        intTree.delete(3)
+        var node2 = intTree.search(3)
+        assertEquals(node2, null)
+
+    }
+
+    @RepeatedTest(20)
+    fun `delete 3`() {
+        var arr = Array<Int>(5) {
+            Random.nextInt(randomNumberMinValue, 100)
+        }
+        var list = arr.distinct().toTypedArray()
+        list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        list.sort()
+
+        var indexes = Array<Int>(list.size) { it }
+        indexes.shuffle()
+        list.forEach { print("$it ") }
+        println()
+        indexes.forEach { print("$it ") }
+        println()
+        for (i in indexes) {
+            intTree.delete(list[i])
+            var node = intTree.search(list[i])
+            assertEquals(node, null)
+        }
+        assertEquals(intTree.root, null)
+    }
 }

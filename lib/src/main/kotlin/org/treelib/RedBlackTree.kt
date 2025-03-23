@@ -27,6 +27,10 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
 
     var size = 0
 
+    fun isEmpty(): Boolean {
+        return root == null
+    }
+
     private fun flipColors(node: RBNode<K, V>?) {
         node?.let {
             node.color = !node.color
@@ -178,7 +182,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             var (newRoot, deletedNode)= deleteMax(it)
             root = newRoot
-            if (root != null) it.color = BLACK
+            if (!isEmpty()) it.color = BLACK
 
             return deletedNode
 
@@ -213,7 +217,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             var (newRoot, deletedNode) = deleteMin(it)
             root = newRoot
-            if (root != null) root?.color = BLACK
+            if (!isEmpty()) root?.color = BLACK
             return deletedNode
         }
         throw NoSuchElementException("deleteMin: Underflow")
@@ -263,6 +267,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                     x.data = search(it, min(it).key)?.data ?: throw Exception("Can't find min in subtree")
                     x.key = min(it).key
                     var (newRight, _) = deleteMin(it)
+                    x.right = newRight
                 }
             }
             else {
@@ -281,7 +286,8 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                 it.color = RED
             }
             root = delete(it, key)
-            if (root != null) root?.color = BLACK
+            if (!isEmpty()) root?.color = BLACK
+            return root //dummy return
         }
         throw NoSuchElementException("Nothing to delete")
     }
