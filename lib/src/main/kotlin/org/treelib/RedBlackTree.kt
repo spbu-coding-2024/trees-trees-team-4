@@ -12,8 +12,11 @@ class RBNode<K: Comparable<K>, V : Any>(key: K, data: V, colorArg: Boolean): Nod
     internal fun leftIsRed() : Boolean {
         return this.left?.color ?: BLACK
     }
-    internal fun leftLeftIsRed() : Boolean {
+    internal fun leftLeftIsRed() : Boolean { //TODO(find null safe solution to not use this method)
         return this.left?.left?.color ?: BLACK
+    }
+    internal fun rightLeftIsRed() : Boolean {
+        return this.right?.left?.color ?: BLACK
     }
     internal fun rightIsRed() : Boolean {
         return this.right?.color ?: BLACK
@@ -67,19 +70,29 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     override fun min(): RBNode<K,V>? {
-        var current = root
-        while (current?.left != null) {
-            current = current.left
-        }
-        return current
+        root?.let {
+            return min(it)
+        } ?:
+        throw Exception("Nothing to search")
     }
 
-    override fun max(): RBNode<K, V>? {
-        var current = root
-        while (current?.right != null) {
-            current = current.right
-        }
-        return current
+    private fun min(node: RBNode<K, V>): RBNode<K, V> {
+        node.left?.let {
+            return min(it)
+        } ?: return node
+    }
+
+    private fun max(node: RBNode<K, V>): RBNode<K, V> {
+        node.right?.let {
+            return max(it)
+        } ?: return node
+    }
+
+    override fun max(): RBNode<K,V>? {
+        root?.let {
+            return max(it)
+        } ?:
+        throw Exception("Nothing to search")
     }
 
     override fun insert(key: K, value: V): RBNode<K, V> {
@@ -108,22 +121,31 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     override fun search(key: K): RBNode<K, V>? {
-        var current = root
-        while (current != null) {
-            if (current.key < key) {
-                current = current.right
-            }
-            else if (current.key > key) {
-                current = current.left
-            }
-            else if (current.key == key) {
-                return current
+        root?.let{
+            return search(it, key)
+        } ?: return null
+    }
+
+    private fun search(node: RBNode<K, V>, key: K): RBNode<K, V>? {
+        var x: RBNode<K, V>? = null
+        if (node.key < key) {
+            node.right?.let {
+                x = search(it, key)
             }
         }
-        return null
+        else if (node.key > key) {
+            node.left?.let {
+                x = search(it, key)
+            }
+        }
+        else if (node.key == key) {
+            x = node
+        }
+        return x
     }
 
     private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
+        require(!node.leftLeftIsRed() && !node.leftIsRed())
         var x = node
         flipColors(x)
         x.right?.let {
@@ -137,6 +159,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun moveRedRight(node: RBNode<K, V>): RBNode<K, V> {
+        require(node.right != null && !node.rightLeftIsRed())
         var x = node
         flipColors(x)
         x.left?.let {
@@ -179,7 +202,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             var (newRight, deletedNode) = deleteMax(x.right)
             x.right = newRight
             return Pair(balanceNode(x), deletedNode)
-        } ?: throw Exception("Something went wrong in deleteMax")
+        } ?: throw Exception("Something went wrong in deleteMax") //TODO(rename this exception)
     }
 
 
@@ -199,7 +222,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     private fun deleteMin(node: RBNode<K, V>?): Pair<RBNode<K, V>?, RBNode<K, V>> {
         var x = node
 
-
         x?.let {
             var left = x.left
             if (left == null) {
@@ -213,11 +235,55 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             x.left = newLeft
 
             return Pair(balanceNode(x), deletedNode)
-        } ?: throw Exception("Something went wrong in deleteMin")
+        } ?: throw Exception("Something went wrong in deleteMin") //TODO(rename this exception)
+    }
+
+    private fun delete(node: RBNode<K, V>, key: K): RBNode<K, V>? {
+        var x = node
+        if (key < x.key) {
+            if (!x.leftIsRed() && !x.leftLeftIsRed()) {
+                x = moveRedLeft(x)
+            }
+            x.left?.let {
+                x.left = delete(it, key)
+            } ?: throw Exception("Delete Exception: left node is null")
+        } else {
+            if (x.leftIsRed()) {
+                x = rotateRight(x)
+            }
+            if (key == x.key && x.right == null) {
+                require(x.isRed())
+                return null
+            }
+            if (!x.rightIsRed() && !x.rightLeftIsRed()) {
+                x = moveRedRight(x)
+            }
+            if (key == x.key) {
+                x.right?.let {
+                    x.data = search(it, min(it).key)?.data ?: throw Exception("Can't find min in subtree")
+                    x.key = min(it).key
+                    var (newRight, _) = deleteMin(it)
+                }
+            }
+            else {
+                x.right?.let {
+                    x.right = delete(it, key)
+                } ?: throw Exception("Delete Exception: right node is null")
+            }
+
+        }
+        return balanceNode(x)
     }
 
     override fun delete(key: K): RBNode<K, V>? {
-        TODO("WIP")
+        root?.let {
+            if (!it.leftIsRed() && !it.rightIsRed()) {
+                it.color = RED
+            }
+            root = delete(it, key)
+            if (root != null) root?.color = BLACK
+        }
+        throw NoSuchElementException("Nothing to delete")
     }
 
     override fun iterator(key: K): Iterable<RBNode<K, V>> {
