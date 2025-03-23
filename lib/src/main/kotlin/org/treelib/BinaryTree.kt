@@ -1,6 +1,4 @@
-
 package org.treelib
-
 
 abstract class BinaryTree<K: Comparable<K>, V: Any, N> {
     internal var root: N? = null

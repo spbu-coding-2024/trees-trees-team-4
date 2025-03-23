@@ -3,8 +3,8 @@ package org.treelib
 const val RED = true
 const val BLACK = false
 
-class RBNode<K: Comparable<K>, V : Any>(key: K, data: V, colorArg: Boolean): Node<K, V, RBNode<K,V>>(key, data) {
-    var color: Boolean = colorArg
+class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>>(key, data) {
+    var color: Boolean = RED
 }
 
 class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
@@ -19,16 +19,13 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun flipColors(node: RBNode<K, V>?) {
-        node?.let {
-            node.color = !node.color
-            node.left?.let {
-                it.color = !it.color
-            }
-            node.right?.let {
-                it.color = !it.color
-            }
-        } ?: {
-            NullPointerException("Can't flip colors")
+        checkNotNull(node)
+        node.color = !node.color
+        node.left?.let {
+            it.color = !it.color
+        }
+        node.right?.let {
+            it.color = !it.color
         }
     }
 
@@ -64,7 +61,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         root?.let {
             return min(it)
         } ?:
-        throw Exception("Nothing to search")
+        throw NoSuchElementException("Nothing to search")
     }
 
     private fun min(node: RBNode<K, V>): RBNode<K, V> {
@@ -83,11 +80,11 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         root?.let {
             return max(it)
         } ?:
-        throw Exception("Nothing to search")
+        throw NoSuchElementException("Nothing to search")
     }
 
     override fun insert(key: K, value: V): RBNode<K, V> {
-        var newNode = RBNode<K,V>(key, value, RED)
+        var newNode = RBNode<K,V>(key, value)
         root = insert(root, key, value, newNode)
         root?.color = BLACK
         size++
@@ -136,7 +133,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
-        //require(isRed(node) && !isRed(node.left?.left) && !isRed(node.left))
+        require(isRed(node) && !isRed(node.left?.left) && !isRed(node.left))
         var x = node
         flipColors(x)
         x.right?.let {
@@ -190,8 +187,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             var (newRight, deletedNode) = deleteMax(it)
             x.right = newRight
             return Pair(balanceNode(x), deletedNode)
-        } ?:
-        throw IllegalStateException("deleteMax: right node is null")
+        } ?: error("deleteMax: right node is null")
     }
 
 
@@ -205,7 +201,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             if (!isEmpty()) root?.color = BLACK
             size--
             return deletedNode
-        }
+        } ?:
         throw NoSuchElementException("deleteMin: Underflow")
     }
 
@@ -222,7 +218,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             var (newLeft, deletedNode) = deleteMin(it)
             x.left = newLeft
             return Pair(balanceNode(x), deletedNode)
-        } ?: throw IllegalStateException("deleteMin: left node is null")
+        } ?: error("deleteMin: left node is null")
     }
 
     private fun delete(node: RBNode<K, V>, key: K): RBNode<K, V>? {
@@ -231,9 +227,9 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             if (!isRed(x.left) && !isRed(x.left?.left)) {
                 x = moveRedLeft(x)
             }
-            x.left?.let {
+            x.left?.let{
                 x.left = delete(it, key)
-            } ?: throw Exception("Delete Exception: left node is null")
+            }
         } else {
             if (isRed(x.left)) {
                 x = rotateRight(x)
@@ -247,7 +243,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             if (key == x.key) {
                 x.right?.let {
-                    x.data = search(it, min(it).key)?.data ?: throw Exception("Can't find min in subtree")
+                    x.data = search(it, min(it).key)?.data ?: throw NoSuchElementException("Can't find min in subtree")
                     x.key = min(it).key
                     var (newRight, _) = deleteMin(it)
                     x.right = newRight
@@ -256,9 +252,8 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             else {
                 x.right?.let {
                     x.right = delete(it, key)
-                } ?: throw Exception("Delete Exception: right node is null")
+                }
             }
-
         }
         return balanceNode(x)
     }
@@ -271,7 +266,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             root = delete(it, key)
             if (!isEmpty()) root?.color = BLACK
             return root //TODO("make delete return deleted node")
-        }
+        } ?:
         throw NoSuchElementException("Nothing to delete")
     }
 

@@ -7,24 +7,26 @@ import org.junit.jupiter.api.RepeatedTest
 import kotlin.random.Random
 import kotlin.test.BeforeTest
 
-const val randomNumberMaxValue = 100
-const val randomNumberMinValue = 0
-const val randomNumberCount = 8
+const val RANDOM_NUMBER_MAX_VALUE = 100
+const val RANDOM_NUMBER_MIN_VALUE = 0
+const val RANDOM_NUMBER_COUNT = 8
 
 class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V>) {
 
     fun isBlackBalanced() {
-        if (subtreeBlackCountDifference(tree.root) == -1) throw Exception("Invariant failed: tree is not perfect black balanced")
+        if (subtreeBlackCountDifference(tree.root) == -1) {
+            error("Invariant failed: tree is not perfect black balanced")
+        }
     }
 
     private fun subtreeBlackCountDifference(node: RBNode<K, V>?): Int {
         node?.let {
             var left = subtreeBlackCountDifference(node.left)
             var right = subtreeBlackCountDifference(node.right)
-            if (left == right) {
-                return left
+            return if (left == right) {
+                left
             } else {
-                return -1
+                -1
             }
 
         } ?:let {
@@ -37,7 +39,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     private fun assertRedLinkAreLeaningLeft(node: RBNode<K, V>?) {
         node?.let {
             if (tree.isRed(node.right)) {
-                throw Exception("Invariant failed: tree is with right leaning red link")
+                error("Invariant failed: tree is with right leaning red link")
             }
             assertRedLinkAreLeaningLeft(node.left)
             assertRedLinkAreLeaningLeft(node.right)
@@ -48,7 +50,9 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
         return countNodes(node.left) + 1 + countNodes(node.right)
     }
     fun sizeIsCorrect() {
-        if (countNodes(tree.root) != tree.size) throw Exception("Invariant failed: size is not correct")
+        if (countNodes(tree.root) != tree.size) {
+            error("Invariant failed: size is not correct")
+        }
     }
 
     fun checkAll() {
@@ -102,8 +106,8 @@ class RedBlackTreePropertyBasedTests {
     @BeforeTest
     fun before() {
         randomTree = RedBlackTree<Int, Int>()
-        randomKeys = Array<Int>(randomNumberCount) {
-            Random.nextInt(randomNumberMinValue, randomNumberMaxValue)
+        randomKeys = Array<Int>(RANDOM_NUMBER_COUNT) {
+            Random.nextInt(RANDOM_NUMBER_MIN_VALUE, RANDOM_NUMBER_MAX_VALUE)
         }
         randomKeys = randomKeys.distinct().toTypedArray()
         randomKeys.forEachIndexed { ind, value -> randomTree.insert(value, ind) }
