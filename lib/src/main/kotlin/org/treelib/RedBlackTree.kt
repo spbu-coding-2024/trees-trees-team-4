@@ -166,11 +166,9 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         require(node.right != null && !node.rightLeftIsRed())
         var x = node
         flipColors(x)
-        x.left?.let {
-            if (it.leftIsRed()) {
-                x = rotateRight(x)
-                flipColors(x)
-            }
+        if (x.leftLeftIsRed()) {
+            x = rotateRight(x)
+            flipColors(x)
         }
         return x
     }
@@ -183,7 +181,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             var (newRoot, deletedNode)= deleteMax(it)
             root = newRoot
             if (!isEmpty()) it.color = BLACK
-
+            size--
             return deletedNode
 
         }
@@ -198,7 +196,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             var right = x.right
             if (right == null) {
-                return Pair(null, node)
+                return Pair(x.left, node)
             }
             if (!right.isRed() && !right.leftIsRed()) {
                 x = moveRedRight(x)
@@ -218,6 +216,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             var (newRoot, deletedNode) = deleteMin(it)
             root = newRoot
             if (!isEmpty()) root?.color = BLACK
+            size--
             return deletedNode
         }
         throw NoSuchElementException("deleteMin: Underflow")
@@ -287,7 +286,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             root = delete(it, key)
             if (!isEmpty()) root?.color = BLACK
-            return root //dummy return
+            return root //TODO("make delete return deleted node")
         }
         throw NoSuchElementException("Nothing to delete")
     }
@@ -295,5 +294,4 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     override fun iterator(key: K): Iterable<RBNode<K, V>> {
         TODO("WIP")
     }
-
 }
