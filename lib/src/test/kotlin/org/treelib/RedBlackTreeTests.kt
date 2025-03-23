@@ -7,6 +7,12 @@ import org.junit.jupiter.api.RepeatedTest
 import kotlin.random.Random
 import kotlin.test.BeforeTest
 
+const val tries = 20
+const val randomNumberMaxValue = 1000
+const val randomNumberMinValue = 0
+const val randomNumberCount = 30
+
+
 class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V>) {
 
     fun isBlackBalanced(): Boolean {
@@ -91,8 +97,8 @@ class RedBlackTreeTests {
 
     @RepeatedTest(10)
     fun `tree is with red leaning links`() {
-        for (i in 1..25) {
-            var randomKey = Random.nextInt(0,1000)
+        for (i in 1..tries) {
+            var randomKey = Random.nextInt(randomNumberMinValue, randomNumberMaxValue)
             intTree.insert(randomKey, i)
         }
         check.assertRedLinkAreLeaningLeft()
@@ -110,8 +116,8 @@ class RedBlackTreeTests {
 
     @RepeatedTest(10)
     fun `search function test 2`() {
-        var arr = Array<Int>(8) {
-            Random.nextInt(0, 100)
+        var arr = Array<Int>(randomNumberCount) {
+            Random.nextInt(randomNumberMaxValue, randomNumberMaxValue)
         }
         var list = arr.distinct()
         list.forEachIndexed { ind, value -> intTree.insert(value, ind) }
@@ -137,8 +143,8 @@ class RedBlackTreeTests {
 
     @RepeatedTest(5)
     fun `deleteMin 2`() {
-        var arr = Array<Int>(8) {
-            Random.nextInt(0, 100)
+        var arr = Array<Int>(randomNumberCount) {
+            Random.nextInt(randomNumberMinValue, randomNumberMaxValue)
         }
         var list = arr.distinct().toTypedArray()
         list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
@@ -166,8 +172,8 @@ class RedBlackTreeTests {
 
     @RepeatedTest(5)
     fun `deleteMax 2`() {
-        var arr = Array<Int>(8) {
-            Random.nextInt(0, 100)
+        var arr = Array<Int>(randomNumberCount) {
+            Random.nextInt(randomNumberMinValue, randomNumberMaxValue)
         }
         var list = arr.distinct().toTypedArray()
         list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
