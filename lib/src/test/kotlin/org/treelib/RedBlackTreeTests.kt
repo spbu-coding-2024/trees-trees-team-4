@@ -135,7 +135,7 @@ class RedBlackTreeTests {
         assertEquals(intTree.root, null)
     }
 
-    @Test
+    @RepeatedTest(5)
     fun `deleteMin 2`() {
         var arr = Array<Int>(8) {
             Random.nextInt(0, 100)
@@ -143,8 +143,37 @@ class RedBlackTreeTests {
         var list = arr.distinct().toTypedArray()
         list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
         list.sort()
-        for (i in 0..(arr.size - 1)) {
+        for (i in 0..(list.size - 1)) {
             intTree.deleteMin()
+            var node = intTree.search(list[i])
+            assertEquals(node, null)
+        }
+        assertEquals(intTree.root, null)
+    }
+
+    @Test
+    fun `deleteMax 1`() {
+        var arr = arrayOf(10, 44, 3, 88, 2, 86, 20, 60)
+        arr.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        arr.sort()
+        for (i in (arr.size - 1) downTo 0) {
+            intTree.deleteMax()
+            var node = intTree.search(arr[i])
+            assertEquals(node, null)
+        }
+        assertEquals(intTree.root, null)
+    }
+
+    @RepeatedTest(5)
+    fun `deleteMax 2`() {
+        var arr = Array<Int>(8) {
+            Random.nextInt(0, 100)
+        }
+        var list = arr.distinct().toTypedArray()
+        list.forEachIndexed { ind, value -> intTree.insert(value , ind)}
+        list.sort()
+        for (i in (list.size - 1) downTo 0) {
+            intTree.deleteMax()
             var node = intTree.search(list[i])
             assertEquals(node, null)
         }

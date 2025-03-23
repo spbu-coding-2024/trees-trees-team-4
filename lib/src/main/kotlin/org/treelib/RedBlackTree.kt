@@ -25,8 +25,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     var size = 0
 
     private fun flipColors(node: RBNode<K, V>?) {
-        node?. let {
-            require(node.leftIsRed() && node.rightIsRed())
+        node?.let {
             node.color = !node.color
             node.left?.let {
                 it.color = !it.color
@@ -83,22 +82,23 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return current
     }
 
-    override fun insert(key: K, value: V) {
-        val node = insert(root, key, value)
-        node.color = BLACK
+    override fun insert(key: K, value: V): RBNode<K, V> {
+        var newNode = RBNode<K,V>(key, value, RED)
+        root = insert(root, key, value, newNode)
+        root?.color = BLACK
         size++
-        root = node
+        return newNode
     }
 
-    private fun insert(node: RBNode<K, V>?, key: K, value: V): RBNode<K, V> {
+    private fun insert(node: RBNode<K, V>?, key: K, value: V, newNode: RBNode<K, V>): RBNode<K, V> {
         if (node == null) {
-            return RBNode(key, value, RED)
+            return newNode
         }
         if (node.key > key) {
-            node.left = insert(node.left, key, value)
+            node.left = insert(node.left, key, value, newNode)
         }
         else if (node.key < key) {
-            node.right = insert(node.right, key, value)
+            node.right = insert(node.right, key, value, newNode)
         }
         else {
             node.data = value
@@ -126,7 +126,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
         var x = node
         flipColors(x)
-        //if (x.right != null && node.right?.left != null) {
         x.right?.let {
             if (it.leftIsRed()) {
                 x.right = rotateRight(it)
@@ -140,71 +139,81 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     private fun moveRedRight(node: RBNode<K, V>): RBNode<K, V> {
         var x = node
         flipColors(x)
-        x.right?.let {
+        x.left?.let {
             if (it.leftIsRed()) {
-                x.right = rotateRight(it)
-                x = rotateLeft(x)
+                x = rotateRight(x)
                 flipColors(x)
             }
         }
         return x
     }
 
-//    fun deleteMax() {
-//        root?.let {
-//            if (!it.rightIsRed() && !it.leftIsRed()) {
-//                it.color = RED
-//            }
-//            root = deleteMax(it)
-//            if (root != null) it.color = BLACK
-//        } ?: {
-//            throw NoSuchElementException("deleteMax: Underflow")
-//        }
-//
-//    }
-//
-//    private fun deleteMax(node: RBNode<K, V>?): RBNode<K, V>? {
-//        var x = node
-//        x?.let {
-//            if (!x.leftIsRed() && !x.rightIsRed()) {
-//                x = moveRedLeft(x)
-//            }
-//            x = deleteMax(x.left)
-//
-//            x?.let {
-//                return balanceNode(it)
-//            } ?: throw Exception("Something went wrong while deleting")
-//        }
-//        return throw Exception("Something went wrong while deleting")
-//    }
-
-
-    fun deleteMin() {
+    fun deleteMax(): RBNode<K, V> {
         root?.let {
             if (!it.rightIsRed() && !it.leftIsRed()) {
                 it.color = RED
             }
-            root = deleteMin(it)
+            var (newRoot, deletedNode)= deleteMax(it)
+            root = newRoot
             if (root != null) it.color = BLACK
-        } ?: {
-            throw NoSuchElementException("deleteMin: Underflow")
-        }
 
+            return deletedNode
+
+        }
+        throw NoSuchElementException("deleteMax: Underflow")
     }
 
-    private fun deleteMin(node: RBNode<K, V>?): RBNode<K, V>? {
+    private fun deleteMax(node: RBNode<K, V>?): Pair<RBNode<K, V>?, RBNode<K, V> >{
         var x = node
-        x?.left?.let {
-            if (!it.isRed() && !it.leftIsRed()) {
+        x?.let {
+            if (x.leftIsRed()) {
+                x = rotateRight(x)
+            }
+            var right = x.right
+            if (right == null) {
+                return Pair(null, node)
+            }
+            if (!right.isRed() && !right.leftIsRed()) {
+                x = moveRedRight(x)
+            }
+            var (newRight, deletedNode) = deleteMax(x.right)
+            x.right = newRight
+            return Pair(balanceNode(x), deletedNode)
+        } ?: throw Exception("Something went wrong in deleteMax")
+    }
+
+
+    fun deleteMin(): RBNode<K,V> {
+        root?.let {
+            if (!it.rightIsRed() && !it.leftIsRed()) {
+                it.color = RED
+            }
+            var (newRoot, deletedNode) = deleteMin(it)
+            root = newRoot
+            if (root != null) root?.color = BLACK
+            return deletedNode
+        }
+        throw NoSuchElementException("deleteMin: Underflow")
+    }
+
+    private fun deleteMin(node: RBNode<K, V>?): Pair<RBNode<K, V>?, RBNode<K, V>> {
+        var x = node
+
+
+        x?.let {
+            var left = x.left
+            if (left == null) {
+                return Pair(null, node)
+            }
+            if (!left.isRed() && !left.leftIsRed()) {
                 x = moveRedLeft(x)
             }
-            x = deleteMin(x.left)
 
-            x?.let {
-                return balanceNode(it)
-            } ?: throw Exception("Something went wrong while deleting")
-        }
-        return throw Exception("Something went wrong while deleting")
+            var (newLeft, deletedNode) = deleteMin(x.left)
+            x.left = newLeft
+
+            return Pair(balanceNode(x), deletedNode)
+        } ?: throw Exception("Something went wrong in deleteMin")
     }
 
     override fun delete(key: K): RBNode<K, V>? {
