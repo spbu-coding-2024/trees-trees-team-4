@@ -4,7 +4,8 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 	internal var height: Int = 0
 }
 
-class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AVLNode<K, V>>(key, data), RotatableTree<K, V> {
+class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AVLNode<K, V>>(key, data),
+	RotatableTree<K, V> {
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: -1
 	}
@@ -41,22 +42,30 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 
 	private fun insert(key: K, data: V, cur: AVLNode<K, V>): AVLNode<K, V> {
 		if (key < cur.key) {
-			if (cur.left == null) {
-				cur.left = AVLNode(key, data)
+			val leftChild = cur.left
+			leftChild?.let {
+				return insert(key, data, leftChild)
+			} ?: run {
+				val newNode = AVLNode(key, data)
+				cur.left = newNode
 				updateHeight(cur)
 				balance(cur)
-				return cur.left
-			} else return insert(key, data, cur.left)
-		} else if (key == cur.key) {
+				return newNode
+			}
+		} else if (key > cur.key) {
+			val rightChild = cur.right
+			rightChild?.let {
+				return insert(key, data, rightChild)
+			} ?: run {
+				val newNode = AVLNode(key, data)
+				cur.right = newNode
+				updateHeight(cur)
+				balance(cur)
+				return newNode
+			}
+		} else {
 			cur.data = data
 			return cur
-		} else {
-			if (cur.right == null) {
-				cur.right = AVLNode(key, data)
-				updateHeight(cur)
-				balance(cur)
-				return cur.right
-			} else return insert(key, data, cur.right)
 		}
 	}
 
@@ -69,15 +78,12 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 
 	private fun delete(key: K, curNode: AVLNode<K, V>?): AVLNode<K, V>? {
 		curNode?.let {
-			if (key < it.key)
-				return delete(key, it.left)
-			if (key > it.key)
-				return delete(key, it.right)
-			else{
-				if (it.left == null || it.right == null){
+			if (key < it.key) return delete(key, it.left)
+			if (key > it.key) return delete(key, it.right)
+			else {
+				if (it.left == null || it.right == null) {
 					return it.left ?: it.right
-				}
-				else {
+				} else {
 					val predecessor = max(it.left)
 					it.key = predecessor.key
 					it.data = predecessor.data
