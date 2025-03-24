@@ -35,7 +35,7 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 
 	override fun insert(key: K, data: V): AVLNode<K, V>? {
 		root?.let {
-			return insert(key, data, it)
+			return insert(key, data, it as AVLNode<K, V>)
 		}
 		return null
 	}
@@ -71,7 +71,7 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 
 	override fun delete(key: K): AVLNode<K, V>? {
 		root?.let {
-			return delete(key, it)
+			return delete(key, it as AVLNode<K, V>)
 		}
 		return null
 	}
