@@ -6,6 +6,8 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 
 class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AVLNode<K, V>>(key, data),
 	RotatableTree<K, V> {
+		override var root: AVLNode<K, V>? = AVLNode(key, data)
+
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: -1
 	}
