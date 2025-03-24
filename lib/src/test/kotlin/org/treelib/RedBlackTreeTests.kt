@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.RepeatedTest
 import kotlin.random.Random
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 const val RANDOM_NUMBER_MAX_VALUE = 100
@@ -55,6 +56,23 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
         }
     }
 
+    private fun printTree(node: RBNode<K, V>?, indent: Int) {
+        node?.let {
+            node.right?.let { printTree(node.right, indent + 4) }
+            node.left?.let { printTree(node.left, indent + 4) }
+            if (indent > 0) {
+                print(" ".repeat(indent + 1))
+            }
+            println(node.key)
+        }
+    }
+
+    fun printTree() {
+        tree.root?.let{
+            printTree(tree.root, 0)
+        }
+    }
+
     fun checkAll() {
         sizeIsCorrect()
         assertRedLinkAreLeaningLeft()
@@ -70,6 +88,7 @@ class RedBlackTreeUnitTests {
         intTree = RedBlackTree<Int, Int>()
         check = RBTreeInvariantCheck<Int, Int>(intTree)
     }
+
     @Test
     fun `Assert root is null right after initialization`() {
         assertNull(intTree.root)
@@ -90,6 +109,19 @@ class RedBlackTreeUnitTests {
         assertEquals(intTree.root?.data, 257)
         assertEquals(intTree.root?.left?.data, 256)
         assertEquals(intTree.root?.right?.data, 247)
+    }
+
+    @Test
+    fun `Size is consistent 1`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        intTree.insert(19, 4)
+        intTree.insert(50, 5)
+        check.printTree()
+        intTree.delete(23)
+        check.printTree()
+        check.sizeIsCorrect()
     }
 }
 
@@ -112,6 +144,11 @@ class RedBlackTreePropertyBasedTests {
         randomKeys = randomKeys.distinct().toTypedArray()
         randomKeys.forEachIndexed { ind, value -> randomTree.insert(value, ind) }
         check = RBTreeInvariantCheck<Int, Int>(randomTree)
+    }
+
+    @AfterTest
+    fun after() {
+        check.checkAll()
     }
 
     @RepeatedTest(10)
