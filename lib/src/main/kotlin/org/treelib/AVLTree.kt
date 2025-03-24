@@ -76,15 +76,15 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 		return null
 	}
 
-	private fun delete(key: K, curNode: AVLNode<K, V>?): AVLNode<K, V>? {
-		curNode?.let {
+	private fun delete(key: K, cur: AVLNode<K, V>?): AVLNode<K, V>? {
+		cur?.let {
 			if (key < it.key) return delete(key, it.left)
 			if (key > it.key) return delete(key, it.right)
 			else {
 				if (it.left == null || it.right == null) {
 					return it.left ?: it.right
 				} else {
-					val predecessor = max(it.left)
+					val predecessor = max(it.left) ?: return null
 					it.key = predecessor.key
 					it.data = predecessor.data
 					it.left = delete(predecessor.key, it.left)
