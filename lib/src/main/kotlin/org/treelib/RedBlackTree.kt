@@ -221,14 +221,17 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         } ?: error("deleteMin: left node is null")
     }
 
-    private fun delete(node: RBNode<K, V>, key: K): RBNode<K, V>? {
+    private fun delete(node: RBNode<K, V>, key: K): Pair<RBNode<K, V>?,RBNode<K, V>?> {
         var x = node
+        var deletedNode: RBNode<K, V>? = null
         if (key < x.key) {
             if (!isRed(x.left) && !isRed(x.left?.left)) {
                 x = moveRedLeft(x)
             }
             x.left?.let{
-                x.left = delete(it, key)
+                var returnValue = delete(it, key)
+                x.left = returnValue.first
+                deletedNode = returnValue.second
             }
         } else {
             if (isRed(x.left)) {
@@ -236,7 +239,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             if (key == x.key && x.right == null) {
                 require(isRed(x))
-                return x.left
+                return Pair(null, node)
             }
             if (!isRed(x.right) && !isRed(x.right?.left)) {
                 x = moveRedRight(x)
@@ -246,17 +249,20 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                     var minNode = min(it)
                     x.key = minNode.key
                     x.data = minNode.data
-                    var (newRight, _) = deleteMin(it)
-                    x.right = newRight
+                    var returnValue = deleteMin(it)
+                    x.right = returnValue.first
+                    deletedNode = returnValue.second
                 }
             }
             else {
                 x.right?.let {
-                    x.right = delete(it, key)
+                    var returnValue = delete(it, key)
+                    x.right = returnValue.first
+                    deletedNode = returnValue.second
                 }
             }
         }
-        return balanceNode(x)
+        return Pair(balanceNode(x), deletedNode)
     }
 
     override fun delete(key: K): RBNode<K, V>? {
@@ -265,10 +271,11 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
-            root = delete(it, key)
+            var (newRoot, deletedNode) = delete(it, key)
+            root = newRoot
             if (!isEmpty()) root?.color = BLACK
             size--
-            return root //TODO("make delete return deleted node")
+            return deletedNode
         } ?:
         throw NoSuchElementException("Nothing to delete")
     }
