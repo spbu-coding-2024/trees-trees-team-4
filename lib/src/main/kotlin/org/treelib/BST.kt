@@ -6,8 +6,8 @@ class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, dat
 
     override var root: Node<K, V>? = BSTNode(key, data)
 
-    override fun insert(key: K, value: V): Node<K, V> {
-        val resultNode: BSTNode<K, V> = BSTNode(key, value)
+    override fun insert(key: K, data: V): Node<K, V> {
+        val resultNode: BSTNode<K, V> = BSTNode(key, data)
         var currentNode: BSTNode<K, V>? = root as BSTNode<K, V>?
         while (currentNode?.key != null) {
             currentNode =
