@@ -1,10 +1,10 @@
 package org.treelib
 
-class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V>(key, data) {
+class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
 	internal var height: Int = 0
 }
 
-class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V>(key, data), RotatableTree<K, V> {
+class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AVLNode<K, V>>(key, data), RotatableTree<K, V> {
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: -1
 	}
@@ -15,7 +15,7 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V>(ke
 
 	private fun getNodeBalance(node: AVLNode<K, V>?): Int {
 		node?.let {
-			return getHeight(node?.right) - getHeight(node?.left)
+			return getHeight(node.right) - getHeight(node.left)
 		}
 		return 0
 	}
@@ -32,27 +32,27 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V>(ke
 		}
 	}
 
-	override fun insert(key: K, value: V): AVLNode<K, V>? {
+	override fun insert(key: K, data: V): AVLNode<K, V>? {
 		root?.let {
-			return insert(key, value, it)
+			return insert(key, data, it)
 		}
 		return null
 	}
 
-	private fun insert(key: K, value: V, cur: AVLNode<K, V>): AVLNode<K, V> {
+	private fun insert(key: K, data: V, cur: AVLNode<K, V>): AVLNode<K, V> {
 		if (key < cur.key) {
 			if (cur.left == null) {
-				cur.left = AVLNode(key, value)
+				cur.left = AVLNode(key, data)
 				updateHeight(cur)
 				balance(cur)
 				return cur.left
-			} else return insert(key, value, cur.left)
+			} else return insert(key, data, cur.left)
 		} else if (key == cur.key) {
-			cur.data = value
+			cur.data = data
 			return cur
 		} else {
 			if (cur.right == null) {
-				cur.right = AVLNode(key, value)
+				cur.right = AVLNode(key, data)
 				updateHeight(cur)
 				balance(cur)
 				return cur.right
