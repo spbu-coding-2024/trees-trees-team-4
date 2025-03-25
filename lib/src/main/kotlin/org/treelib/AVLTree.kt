@@ -30,8 +30,8 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 			rotateLeft(node)
 		}
 		if (balance == -2) {
-			if (getNodeBalance(node.left) == -1) rotateRight(node.right)
-			rotateLeft(node)
+			if (getNodeBalance(node.left) == 1) rotateLeft(node.right)
+			rotateRight(node)
 		}
 	}
 
