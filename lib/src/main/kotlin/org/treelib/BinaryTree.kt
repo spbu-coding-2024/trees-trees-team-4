@@ -29,6 +29,6 @@ abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(interna
 
 	abstract fun insert(key: K, data: V): N?
 	abstract fun delete(key: K): N?
-//	abstract fun iterator(key: K): Iterable<N>
+	abstract fun iterator(key: K): Iterable<N>
 
 }
