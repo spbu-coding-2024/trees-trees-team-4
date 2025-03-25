@@ -6,7 +6,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 
 class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AVLNode<K, V>>(key, data),
 	RotatableTree<K, V, AVLNode<K, V>> {
-		override var root: AVLNode<K, V>? = AVLNode(key, data)
+	override var root: AVLNode<K, V>? = AVLNode(key, data)
 
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: -1
@@ -30,7 +30,7 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 			rotateLeft(node)
 		}
 		if (balance == -2) {
-			if (getNodeBalance(node.left) == 1) node.left?.let{ rotateLeft(it) }
+			if (getNodeBalance(node.left) == 1) node.left?.let { rotateLeft(it) }
 			rotateRight(node)
 		}
 	}
@@ -72,10 +72,12 @@ class AVLTree<K : Comparable<K>, V : Any>(key: K, data: V) : BinaryTree<K, V, AV
 	}
 
 	override fun delete(key: K): AVLNode<K, V>? {
-		root?.let {
-			return delete(key, it as AVLNode<K, V>)
+		if (key == root?.key) {
+			root = delete(key, root)
+		} else root?.let {
+			return delete(key, it)
 		}
-		return null
+		return root
 	}
 
 	private fun delete(key: K, cur: AVLNode<K, V>?): AVLNode<K, V>? {
