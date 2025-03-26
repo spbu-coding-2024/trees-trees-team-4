@@ -7,6 +7,8 @@ import org.junit.jupiter.api.RepeatedTest
 import kotlin.random.Random
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 const val RANDOM_NUMBER_MAX_VALUE = 100
 const val RANDOM_NUMBER_MIN_VALUE = 0
@@ -63,7 +65,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
             if (indent > 0) {
                 print(" ".repeat(indent + 1))
             }
-            println(node.key)
+            println(if (node.color == RED) "${node.key} R" else "${node.key} B")
         }
     }
 
@@ -112,6 +114,23 @@ class RedBlackTreeUnitTests {
     }
 
     @Test
+    fun `delete 1 `() {
+        intTree.insert(23, 2)
+        intTree.insert(54, 1)
+        intTree.insert(70, 3)
+        intTree.insert(21, 3)
+        intTree.insert(1, 3)
+        check.printTree()
+        assertEquals(intTree.delete(1)?.data, 3)
+        check.checkAll()
+    }
+
+    @Test
+    fun `Empty tree is indeed empty`() {
+        assertEquals(intTree.isEmpty(), true)
+    }
+
+    @Test
     fun `Size is consistent 1`() {
         intTree.insert(54, 1)
         intTree.insert(23, 2)
@@ -123,17 +142,132 @@ class RedBlackTreeUnitTests {
         check.printTree()
         check.sizeIsCorrect()
     }
+
+    @Test
+    fun `Insert overwrites values`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        check.printTree()
+        assertEquals(intTree.search(70)?.data, 3)
+        intTree.insert(70, 10)
+        assertEquals(intTree.search(70)?.data, 10)
+    }
+
+    @Test
+    fun `deleteMin deletes minimum element`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        intTree.insert(19, 4)
+        intTree.insert(50, 5)
+        check.printTree()
+        val minValue = intTree.min()
+        intTree.deleteMin()
+        minValue?.let {
+            assertEquals(intTree.search(it.key), null)
+        } ?: assert(false)
+    }
+
+    @Test
+    fun `deleteMax deletes maximum element`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        intTree.insert(19, 4)
+        intTree.insert(50, 5)
+        check.printTree()
+        val maxValue = intTree.max()
+        intTree.deleteMax()
+        maxValue?.let {
+            assertEquals(intTree.search(it.key), null)
+        } ?: assert(false)
+    }
+
+    @Test
+    fun `search returns null for empty tree`() {
+        assertEquals(intTree.search(1), null)
+    }
+
+    @Test
+    fun `delete throws error for empty tree`() {
+        try {
+            intTree.delete(1)
+        } catch (e: NoSuchElementException) {
+            assertEquals(e.message, "Nothing to delete")
+        }
+    }
+
+    @Test
+    fun `deleteMin throws error for empty tree`() {
+        try {
+            intTree.deleteMin()
+        } catch (e: NoSuchElementException) {
+            assertEquals(e.message, "Nothing to delete")
+        }
+    }
+
+    @Test
+    fun `deleteMax throws error for empty tree`() {
+        try {
+            intTree.deleteMax()
+        } catch (e: NoSuchElementException) {
+            assertEquals(e.message, "Nothing to delete")
+        }
+    }
+
+    @Test
+    fun `delete return null if there are no such element`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        intTree.insert(19, 4)
+        intTree.insert(50, 5)
+        val deletedNode = intTree.delete(1)
+        assertEquals(deletedNode, null)
+    }
+
+    @Test
+    fun `delete tree with two black children`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        assertNotNull(intTree.delete(54))
+        check.checkAll()
+    }
+
+    @Test
+    fun `deleteMin tree with two black children`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        assertNotNull(intTree.deleteMin())
+        check.checkAll()
+    }
+
+    @Test
+    fun `deleteMax tree with two black children`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        assertNotNull(intTree.deleteMax())
+        check.checkAll()
+    }
+
+    @Test
+    fun `search function return null if there are no element`() {
+        intTree.insert(54, 1)
+        intTree.insert(23, 2)
+        intTree.insert(70, 3)
+        assertNull(intTree.search(1234))
+    }
+
 }
 
 class RedBlackTreePropertyBasedTests {
     lateinit var randomTree: RedBlackTree<Int, Int>
     lateinit var check: RBTreeInvariantCheck<Int, Int>
     lateinit var randomKeys: Array<Int>
-
-    fun printRandomKeys() {
-        randomKeys.forEach { print("$it ") }
-        println()
-    }
 
     @BeforeTest
     fun before() {
@@ -143,6 +277,8 @@ class RedBlackTreePropertyBasedTests {
         }
         randomKeys = randomKeys.distinct().toTypedArray()
         randomKeys.forEachIndexed { ind, value -> randomTree.insert(value, ind) }
+        randomKeys.forEach { print("$it ") }
+        println()
         check = RBTreeInvariantCheck<Int, Int>(randomTree)
     }
 
@@ -183,7 +319,6 @@ class RedBlackTreePropertyBasedTests {
 
     @RepeatedTest(20)
     fun `DeleteMax Test`() {
-        printRandomKeys()
         randomKeys.sort()
 
         for (i in (randomKeys.size - 1) downTo 0) {

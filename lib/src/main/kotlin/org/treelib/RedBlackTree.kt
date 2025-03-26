@@ -9,6 +9,7 @@ class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>
 
 class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
     var size = 0
+        private set
 
     fun isEmpty(): Boolean {
         return root == null
@@ -126,7 +127,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                 x = search(it, key)
             }
         }
-        else if (node.key == key) {
+        else {
             x = node
         }
         return x
@@ -169,7 +170,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             return deletedNode
 
         }
-        throw NoSuchElementException("deleteMax: Underflow")
+        throw NoSuchElementException("Nothing to delete")
     }
 
     private fun deleteMax(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V> > {
@@ -202,7 +203,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             size--
             return deletedNode
         } ?:
-        throw NoSuchElementException("deleteMin: Underflow")
+        throw NoSuchElementException("Nothing to delete")
     }
 
     private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
