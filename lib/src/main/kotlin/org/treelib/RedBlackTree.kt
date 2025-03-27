@@ -58,32 +58,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return x
     }
 
-    override fun min(): RBNode<K,V>? {
-        root?.let {
-            return min(it)
-        } ?:
-        throw NoSuchElementException("Nothing to search")
-    }
-
-    private fun min(node: RBNode<K, V>): RBNode<K, V> {
-        node.left?.let {
-            return min(it)
-        } ?: return node
-    }
-
-    private fun max(node: RBNode<K, V>): RBNode<K, V> {
-        node.right?.let {
-            return max(it)
-        } ?: return node
-    }
-
-    override fun max(): RBNode<K,V>? {
-        root?.let {
-            return max(it)
-        } ?:
-        throw NoSuchElementException("Nothing to search")
-    }
-
     override fun insert(key: K, value: V): RBNode<K, V> {
         var newNode = RBNode<K,V>(key, value)
         root = insert(root, key, value, newNode)
@@ -107,30 +81,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
 
         return balanceNode(node)
-    }
-
-    override fun search(key: K): RBNode<K, V>? {
-        root?.let{
-            return search(it, key)
-        } ?: return null
-    }
-
-    private fun search(node: RBNode<K, V>, key: K): RBNode<K, V>? {
-        var x: RBNode<K, V>? = null
-        if (node.key < key) {
-            node.right?.let {
-                x = search(it, key)
-            }
-        }
-        else if (node.key > key) {
-            node.left?.let {
-                x = search(it, key)
-            }
-        }
-        else {
-            x = node
-        }
-        return x
     }
 
     private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
@@ -157,40 +107,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
         return x
     }
-
-    fun deleteMax(): RBNode<K, V> {
-        root?.let {
-            if (!isRed(it.right) && !isRed(it.left)) {
-                it.color = RED
-            }
-            var (newRoot, deletedNode)= deleteMax(it)
-            root = newRoot
-            if (!isEmpty()) it.color = BLACK
-            size--
-            return deletedNode
-
-        }
-        throw NoSuchElementException("Nothing to delete")
-    }
-
-    private fun deleteMax(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V> > {
-        var x = node
-        if (isRed(x.left)) {
-            x = rotateRight(x)
-        }
-        if (x.right == null) {
-            return Pair(x.left, node)
-        }
-        if (!isRed(x.right) && !isRed(x.right?.left)) {
-            x = moveRedRight(x)
-        }
-        x.right?.let {
-            var (newRight, deletedNode) = deleteMax(it)
-            x.right = newRight
-            return Pair(balanceNode(x), deletedNode)
-        } ?: error("deleteMax: right node is null")
-    }
-
 
     fun deleteMin(): RBNode<K,V> {
         root?.let {
@@ -247,9 +163,11 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             if (key == x.key) {
                 x.right?.let {
-                    var minNode = min(it)
-                    x.key = minNode.key
-                    x.data = minNode.data
+                    val minNode = findMin(it)
+                    minNode?.let {
+                        x.key = it.key
+                        x.data = it.data
+                    } ?: throw error("delete: findMin returns null")
                     var returnValue = deleteMin(it)
                     x.right = returnValue.first
                     deletedNode = returnValue.second
@@ -283,9 +201,5 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
 
     fun contains(k: K): Boolean {
         return search(k) != null
-    }
-
-    override fun iterator(key: K): Iterable<RBNode<K, V>> {
-        TODO("WIP")
     }
 }

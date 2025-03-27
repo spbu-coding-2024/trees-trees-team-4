@@ -162,24 +162,9 @@ class RedBlackTreeUnitTests {
         intTree.insert(19, 4)
         intTree.insert(50, 5)
         check.printTree()
-        val minValue = intTree.min()
+        val minValue = intTree.findMin()
         intTree.deleteMin()
         minValue?.let {
-            assertEquals(intTree.search(it.key), null)
-        } ?: assert(false)
-    }
-
-    @Test
-    fun `deleteMax deletes maximum element`() {
-        intTree.insert(54, 1)
-        intTree.insert(23, 2)
-        intTree.insert(70, 3)
-        intTree.insert(19, 4)
-        intTree.insert(50, 5)
-        check.printTree()
-        val maxValue = intTree.max()
-        intTree.deleteMax()
-        maxValue?.let {
             assertEquals(intTree.search(it.key), null)
         } ?: assert(false)
     }
@@ -202,15 +187,6 @@ class RedBlackTreeUnitTests {
     fun `deleteMin throws error for empty tree`() {
         try {
             intTree.deleteMin()
-        } catch (e: NoSuchElementException) {
-            assertEquals(e.message, "Nothing to delete")
-        }
-    }
-
-    @Test
-    fun `deleteMax throws error for empty tree`() {
-        try {
-            intTree.deleteMax()
         } catch (e: NoSuchElementException) {
             assertEquals(e.message, "Nothing to delete")
         }
@@ -242,15 +218,6 @@ class RedBlackTreeUnitTests {
         intTree.insert(23, 2)
         intTree.insert(70, 3)
         assertNotNull(intTree.deleteMin())
-        check.checkAll()
-    }
-
-    @Test
-    fun `deleteMax tree with two black children`() {
-        intTree.insert(54, 1)
-        intTree.insert(23, 2)
-        intTree.insert(70, 3)
-        assertNotNull(intTree.deleteMax())
         check.checkAll()
     }
 
@@ -317,18 +284,6 @@ class RedBlackTreePropertyBasedTests {
         assertEquals(randomTree.root, null)
     }
 
-    @RepeatedTest(20)
-    fun `DeleteMax Test`() {
-        randomKeys.sort()
-
-        for (i in (randomKeys.size - 1) downTo 0) {
-            randomTree.deleteMax()
-            var node = randomTree.search(randomKeys[i])
-            assertEquals(node, null)
-            check.checkAll()
-        }
-        assertEquals(randomTree.root, null)
-    }
     @RepeatedTest(50)
     fun `Delete Test`() {
         var indexes = Array<Int>(randomKeys.size) { it }
