@@ -19,7 +19,7 @@ class AVLTreeTest {
 
 	@Test
 	@DisplayName("Insert: root")
-	fun insert_root(){
+	fun insert_root() {
 		val tree = AVLTree<Int, String>()
 		tree.insert(1, "one")
 
@@ -137,4 +137,42 @@ class AVLTreeTest {
 		assertNull(tree.delete(42))
 		assertEquals(1, tree.root?.key)
 	}
+
+	@Test
+	@DisplayName("Iterator: empty tree")
+	fun iterator_emptyTree() {
+		val tree = AVLTree<Int, String>()
+		val iter = tree.iterator()
+
+		assertFalse(iter.hasNext())
+		assertThrows(NoSuchElementException::class.java) { iter.next() }
+	}
+
+	@Test
+	@DisplayName("Iterator: single element")
+	fun iterator_singleElement() {
+		val tree = AVLTree<Int, String>()
+		tree.insert(42, "forty‑two")
+
+		val iter = tree.iterator().iterator()
+		assertTrue(iter.hasNext())
+		assertEquals("forty‑two", iter.next())
+		assertFalse(iter.hasNext())
+		assertThrows(NoSuchElementException::class.java) { iter.next() }
+	}
+
+	@Test
+	@DisplayName("Iterator: next() throws after exhaustion")
+	fun iterator_nextThrowsAfterExhaustion() {
+		val tree = AVLTree<Int, String>()
+		tree.insert(1, "one")
+
+		val iter = tree.iterator().iterator()
+		assertTrue(iter.hasNext())
+		iter.next()  // consume the only element
+		assertFalse(iter.hasNext())
+		assertThrows(NoSuchElementException::class.java) { iter.next() }
+	}
+
+
 }
