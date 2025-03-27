@@ -1,27 +1,53 @@
 
 package org.treelib
 
+abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(internal open var root: N? = null) {
+	fun findMin(start: N? = root): N? {
+		var resultNode = start ?: return null
+		while (true) {
+			resultNode = resultNode.left ?: return resultNode
+		}
+	}
 
-abstract class BinaryTree<K: Comparable<K>, V: Any>(var key: K, var data: V) {
-    internal abstract var root: Node<K, V>?
-    fun min(): Node<K, V>? {
-        var resultNode = root ?: return null
-        while (true) {
-            resultNode = resultNode.left ?: break
-        }
-        return resultNode
-    }
 
-    fun max(): Node<K, V>? {
-        var resultNode = root ?: return null
-        while (true) {
-            resultNode = resultNode.right ?: break
-        }
-        return resultNode
-    }
+	fun findMax(start: N? = root): N? {
+		var resultNode = start ?: return null
+		while (true) {
+			resultNode = resultNode.right ?: return resultNode
+		}
+	}
 
-    abstract fun insert(key: K, data: V): Node<K, V>?
-    abstract fun search(key: K): Node<K, V>?
-    abstract fun delete(key: K): Node<K, V>?
-    abstract fun iterator(key: K): Iterable<Node<K, V>>
+	fun search(key: K, start: N? = root): N? {
+		var node = start
+		while (node != null) {
+			node = when {
+				key < node.key -> node.left
+				key > node.key -> node.right
+				else -> return node
+			}
+		}
+		return null
+	}
+
+	abstract fun insert(key: K, data: V): N?
+	abstract fun delete(key: K): N?
+	fun iterator(): Iterator<V> = iterator {
+		inorder(root)
+	}
+
+	private suspend fun SequenceScope<V>.inorder(node: Node<K, V, N>?) {
+		if (node != null) {
+			inorder(node.left)
+			yield(node.data)
+			inorder(node.right)
+		}
+	}
+
+	fun next(): V {
+		return iterator().next()
+	}
+
+	fun hasNext(): Boolean {
+		return iterator().hasNext()
+	}
 }
