@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
 class AVLTreeTest {
 	@Test
@@ -128,7 +129,7 @@ class AVLTreeTest {
 	@DisplayName("Delete: nonexistent key")
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
 		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
-		assertNull(tree.delete(42))
+		assertFailsWith<NoSuchElementException> {tree.delete(42)}
 		assertEquals(1, tree.root?.key)
 	}
 
