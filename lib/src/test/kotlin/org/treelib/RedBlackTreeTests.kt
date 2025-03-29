@@ -127,7 +127,7 @@ class RedBlackTreeUnitTests {
 
     @Test
     fun `Empty tree is indeed empty`() {
-        assertEquals(intTree.isEmpty(), true)
+        assertEquals(intTree.root == null, true)
     }
 
     @Test

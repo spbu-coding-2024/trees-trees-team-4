@@ -11,11 +11,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     var size = 0
         private set
 
-    fun isEmpty(): Boolean {
-        return root == null
-    }
-
-    fun isRed(node: RBNode<K, V>?): Boolean {
+    private fun isRed(node: RBNode<K, V>?): Boolean {
         return node?.color ?: BLACK
     }
 
@@ -115,7 +111,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             var (newRoot, deletedNode) = deleteMin(it)
             root = newRoot
-            if (!isEmpty()) root?.color = BLACK
+            if (root != null) root?.color = BLACK
             size--
             return deletedNode
         } ?:
@@ -162,12 +158,12 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                 x = moveRedRight(x)
             }
             if (key == x.key) {
+                val minNode = findMin(x.right)
+                minNode?.let {
+                    x.key = it.key
+                    x.data = it.data
+                } ?: throw error("delete: findMin returns null")
                 x.right?.let {
-                    val minNode = findMin(it)
-                    minNode?.let {
-                        x.key = it.key
-                        x.data = it.data
-                    } ?: throw error("delete: findMin returns null")
                     var returnValue = deleteMin(it)
                     x.right = returnValue.first
                     deletedNode = returnValue.second
@@ -186,20 +182,16 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
 
     override fun delete(key: K): RBNode<K, V>? {
         root?.let {
-            if (!contains(key)) return null
+            if (search(key) == null) return null
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
             var (newRoot, deletedNode) = delete(it, key)
             root = newRoot
-            if (!isEmpty()) root?.color = BLACK
+            if (root != null) root?.color = BLACK
             size--
             return deletedNode
         } ?:
         throw NoSuchElementException("Nothing to delete")
-    }
-
-    fun contains(k: K): Boolean {
-        return search(k) != null
     }
 }
