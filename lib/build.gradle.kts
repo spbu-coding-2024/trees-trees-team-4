@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    jacoco
-    `java-library`
+    id("jacoco")
+    id("java-library")
+    id("org.jetbrains.dokka") version "2.0.0"
 }
 
 repositories {
