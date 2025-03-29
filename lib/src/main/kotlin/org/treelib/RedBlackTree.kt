@@ -8,6 +8,10 @@ class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>
 }
 
 class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
+
+    /**
+     * The amount of node in tree.
+     */
     var size = 0
         private set
 
@@ -66,6 +70,15 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
     }
 
+    /**
+     * Inserts value with corresponding key.
+
+     * If there's no node with the same key in tree, then create new node.
+     * If there's node with same key, then overwrite value of this node.
+     * @param key a key of a node to be inserted
+     * @param value a value of a node to be inserted
+     * @return the inserted node
+     */
     override fun insert(key: K, value: V): RBNode<K, V> {
         var newNode = RBNode<K,V>(key, value)
         root = insert(root, key, value, newNode)
@@ -115,7 +128,12 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
         return x
     }
+    /**
+     * Deletes the minimal element in tree
 
+     * @return the deleted node
+     * @throws NoSuchElementException if there's no nodes in tree
+     */
     fun deleteMin(): RBNode<K,V> {
         root?.let {
             if (!isRed(it.left) && !isRed(it.right)) {
@@ -133,7 +151,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
         var x = node
 
-        if (x.left == null) {
+         if (x.left == null) {
             return Pair(null, node)
         }
         if (!isRed(x.left) && !isRed(x.left?.left)) {
@@ -192,6 +210,13 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return Pair(balanceNode(x), deletedNode)
     }
 
+    /**
+    * Deletes an element with the given key in tree
+    *
+    * @param key a key of node to be deleted
+    * @return the deleted node
+    * @throws NoSuchElementException if there's no nodes in tree
+    */
     override fun delete(key: K): RBNode<K, V>? {
         root?.let {
             if (search(key) == null) return null
