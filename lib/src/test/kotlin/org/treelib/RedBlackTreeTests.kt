@@ -41,7 +41,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     }
     private fun assertRedLinkAreLeaningLeft(node: RBNode<K, V>?) {
         node?.let {
-            if (tree.isRed(node.right)) {
+            if (node.right?.color == RED) {
                 error("Invariant failed: tree is with right leaning red link")
             }
             assertRedLinkAreLeaningLeft(node.left)

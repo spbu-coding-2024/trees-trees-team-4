@@ -41,17 +41,29 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     }
 
     override fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
-        var x = super.rotateLeft(node)
-        x.color = node.color
-        node.color = RED
-        return x
+        val x = node.right
+        x?.let {
+            node.right = x.left
+            x.left = node
+            x.color = node.color
+            node.color = RED
+            return x
+        } ?: let {
+            throw NoSuchElementException("Can't rotate left: right node is null")
+        }
     }
 
     override fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
-        var x = super.rotateRight(node)
-        x.color = node.color
-        node.color = RED
-        return x
+        val x = node.left
+        x?.let {
+            node.left = x.right
+            x.right = node
+            x.color = node.color
+            node.color = RED
+            return x
+        } ?: let {
+            throw NoSuchElementException("Can't rotate right: left node is null")
+        }
     }
 
     override fun insert(key: K, value: V): RBNode<K, V> {
