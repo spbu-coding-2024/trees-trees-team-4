@@ -6,8 +6,8 @@ typealias NSEE = NoSuchElementException
 
 const val RIGHT_HEAVY = 2
 const val LEFT_HEAVY = -2
-const val CHILD_RIGHT_HEAVY = 1
-const val CHILD_LEFT_HEAVY = -1
+const val LEFT_RIGHT_HEAVY = 1
+const val RIGHT_LEFT_HEAVY = -1
 
 
 class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
@@ -32,12 +32,12 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
 		if (balance == RIGHT_HEAVY) {
-			if (getBalance(node.right) == CHILD_LEFT_HEAVY) node.right =
+			if (getBalance(node.right) == RIGHT_LEFT_HEAVY) node.right =
 				rotateRight(node.right ?: throw NSEE())
 			return rotateLeft(node)
 		}
 		if (balance == LEFT_HEAVY) {
-			if (getBalance(node.left) == CHILD_RIGHT_HEAVY) node.left =
+			if (getBalance(node.left) == LEFT_RIGHT_HEAVY) node.left =
 				rotateLeft(node.left ?: throw NSEE())
 			return rotateRight(node)
 		}
