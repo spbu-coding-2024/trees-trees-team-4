@@ -1,8 +1,8 @@
 package org.treelib
 
-class BSTNode<K: Comparable<K>, V: Any>(key: K, data: V) : Node<K, V, BSTNode<K, V>>(key, data)
+class BSTNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, BSTNode<K, V>>(key, data)
 
-class BST<K: Comparable<K>, V: Any>(override var root: BSTNode<K, V>? = null) :
+class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) :
     BinaryTree<K, V, BSTNode<K, V>>(root) {
 
     override fun insert(key: K, data: V): BSTNode<K, V> {
@@ -14,7 +14,7 @@ class BST<K: Comparable<K>, V: Any>(override var root: BSTNode<K, V>? = null) :
                     (currentNode.left ?: break)
                 } else {
                     (currentNode.right ?: break)
-            }
+                }
         }
         if (currentNode != null) {
             if (currentNode.key > resultNode.key) {
@@ -22,78 +22,77 @@ class BST<K: Comparable<K>, V: Any>(override var root: BSTNode<K, V>? = null) :
             } else {
                 currentNode.right = resultNode
             }
-        }
-        else{
+        } else {
             root = resultNode
         }
         return resultNode
     }
 
     override fun delete(key: K): BSTNode<K, V>? {
-        var resultNode: BSTNode<K, V>? = root
+        var result: BSTNode<K, V>? = root
+        var targetNode: BSTNode<K, V>? = root
         var currentNode: BSTNode<K, V>? = null
-        var currentRight: BSTNode<K, V>?
-        while (resultNode != null) {
+        val minimum: BSTNode<K, V>?
+        while (targetNode != null) {
             // Если нашли нужную ноду
-            if (resultNode.key == key) {
-                // Проверяем, каким из потомков является результирующая. Если null - дерево пустое
-                if (currentNode?.left == resultNode) {
-                    // Подменяем результирующую на ее потомка
-                    currentNode.left =
-                        if (resultNode.right == null) {
-                            resultNode.left
-                        } else if (resultNode.left == null) {
-                            resultNode.right
+            if (targetNode.key == key) {
+                result = targetNode
+                if (currentNode == null) {
+                    // Если currentNode == null, то из корня мы никуда не ушли, проверяем корень
+                    root =
+                        if (targetNode.right == null) {
+                            targetNode.left
+                        } else if (targetNode.left == null) {
+                            targetNode.right
                         } else {
-                            // Если у результирующей есть оба потомка, фиксируем правого
-                            currentRight = resultNode.right
-                            // и ищем, куда среди его левых потомков можно вставить левого
-                            while (currentRight?.left != null) {
-                                currentRight = currentRight.left
+                            minimum = findMin(targetNode.right)
+                            if (minimum != null) {
+                                minimum.left = targetNode.left
                             }
-                            if (currentRight != null) {
-                                currentRight.left = resultNode.left
-                            } else {
-                                // Заглушка
-                                resultNode.right = null
-                            }
-                            resultNode.right
-                        }
-                } else if (currentNode?.right == resultNode) {
-                    // Подменяем результирующую на ее потомка
-                    currentNode.right =
-                        if (resultNode.right == null) {
-                            resultNode.left
-                        } else if (resultNode.left == null) {
-                            resultNode.right
-                        } else {
-                            // Если у результирующей есть оба потомка, фиксируем правого
-                            currentRight = resultNode.right
-                            // и ищем, куда среди его левых потомков можно вставить левого
-                            while (currentRight?.left != null) {
-                                currentRight = currentRight.left
-                            }
-                            if (currentRight != null) {
-                                currentRight.left = resultNode.left
-                            } else {
-                                // Заглушка
-                                resultNode.right = null
-                            }
-                            resultNode.right
+                            targetNode.right
                         }
                 } else {
-                    // Если искомый узел - корень, удаляем корень
-                    root = null
+                    // Проверяем, каким из потомков является результирующая.
+                    if (currentNode.left == targetNode) {
+                        // Подменяем результирующую на ее потомка
+                        currentNode.left =
+                            if (targetNode.right == null) {
+                                targetNode.left
+                            } else if (targetNode.left == null) {
+                                targetNode.right
+                            } else {
+                                minimum = findMin(targetNode.right)
+                                if (minimum != null) {
+                                    minimum.left = targetNode.left
+                                }
+                                targetNode.right
+                            }
+                    } else {
+                        // Подменяем результирующую на ее потомка
+                        currentNode.right =
+                            if (targetNode.right == null) {
+                                targetNode.left
+                            } else if (targetNode.left == null) {
+                                targetNode.right
+                            } else {
+                                minimum = findMin(targetNode.right)
+                                if (minimum != null) {
+                                    minimum.left = targetNode.left
+                                }
+                                targetNode.right
+                            }
+                    }
                 }
+                break;
             }
-                if (resultNode.key > key) {
-                    currentNode = resultNode
-                    resultNode = resultNode.left ?: break
-                } else if (resultNode.key < key) {
-                    currentNode = resultNode
-                    resultNode = resultNode.right ?: break
-                }
+            if (targetNode.key > key) {
+                currentNode = targetNode
+                targetNode = targetNode.left ?: break
+            } else if (targetNode.key < key) {
+                currentNode = targetNode
+                targetNode = targetNode.right ?: break
             }
-        return resultNode
+        }
+        return result
     }
 }
