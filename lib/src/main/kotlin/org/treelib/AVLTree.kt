@@ -58,7 +58,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		return node
 	}
 
-	override fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
 		val rightChild = node.right ?: return node
 		val middleSubtree = rightChild.left
 
@@ -73,7 +73,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		return rightChild
 	}
 
-	override fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
 		val leftChild = node.left ?: return node
 		val middleSubtree = leftChild.right
 
