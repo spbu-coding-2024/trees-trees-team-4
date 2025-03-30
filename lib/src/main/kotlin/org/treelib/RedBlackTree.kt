@@ -4,10 +4,16 @@ const val RED = true
 const val BLACK = false
 
 class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>>(key, data) {
+    /**
+     * A color of a node.
+     */
     var color: Boolean = RED
 }
-
-class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
+/**
+ * 
+ *
+ */
+class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() {
 
     /**
      * The amount of node in tree.
@@ -44,7 +50,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return x
     }
 
-    override fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
+    private fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
         val x = node.right
         x?.let {
             node.right = x.left
@@ -57,7 +63,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
     }
 
-    override fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
+    private fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
         val x = node.left
         x?.let {
             node.left = x.right

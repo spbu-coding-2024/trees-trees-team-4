@@ -7,7 +7,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 }
 
 class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = null) :
-	BinaryTree<K, V, AVLNode<K, V>>(root), RotatableTree<K, V, AVLNode<K, V>> {
+	BinaryTree<K, V, AVLNode<K, V>>(root) {
 
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: 0
@@ -33,7 +33,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		}
 	}
 
-	override fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
 		val rightChild = node.right ?: return node
 		val middleSubtree = rightChild.left
 
@@ -45,7 +45,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		return rightChild
 	}
 
-	override fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
 		val leftChild = node.left ?: return node
 		val middleSubtree = leftChild.right
 
