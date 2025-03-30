@@ -4,6 +4,12 @@ import kotlin.math.max
 
 typealias NSEE = NoSuchElementException
 
+const val RIGHT_HEAVY = 2
+const val LEFT_HEAVY = -2
+const val CHILD_RIGHT_HEAVY = 1
+const val CHILD_LEFT_HEAVY = -1
+
+
 class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
 	internal var height: Int = 1
 }
@@ -16,24 +22,24 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 	}
 
 	private fun updateHeight(node: AVLNode<K, V>) {
-		node.height = max(getHeight(node.left), getHeight(node.right))
+		node.height = max(getHeight(node.left), getHeight(node.right)) + 1
 	}
 
 	private fun getBalance(node: AVLNode<K, V>?): Int {
-		return if (node == null) 0 else getHeight(node.left) - getHeight(node.right)
+		return if (node == null) 0 else getHeight(node.right) - getHeight(node.left)
 	}
 
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
-		if (balance > 1) {
-			if (getBalance(node.left) < 0)
-				node.left = rotateLeft(node.left ?: throw NSEE())
-			return rotateRight(node)
-		}
-		if (balance < -1) {
-			if (getBalance(node.right) > 0)
-				node.right = rotateRight(node.right ?: throw NSEE())
+		if (balance == RIGHT_HEAVY) {
+			if (getBalance(node.right) == CHILD_LEFT_HEAVY) node.right =
+				rotateRight(node.right ?: throw NSEE())
 			return rotateLeft(node)
+		}
+		if (balance == LEFT_HEAVY) {
+			if (getBalance(node.left) == CHILD_RIGHT_HEAVY) node.left =
+				rotateLeft(node.left ?: throw NSEE())
+			return rotateRight(node)
 		}
 		return node
 	}
@@ -45,8 +51,8 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.right = middleSubtree
 		rightChild.left = node
 
-		node.height = 1 + max(getHeight(node.left), getHeight(node.right))
-		rightChild.height = 1 + max(getHeight(rightChild.left), getHeight(rightChild.right))
+		updateHeight(node)
+		updateHeight(rightChild)
 		return rightChild
 	}
 
@@ -57,8 +63,8 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.left = middleSubtree
 		leftChild.right = node
 
-		node.height = 1 + max(getHeight(node.left), getHeight(node.right))
-		leftChild.height = 1 + max(getHeight(leftChild.left), getHeight(leftChild.right))
+		updateHeight(node)
+		updateHeight(leftChild)
 		return leftChild
 	}
 
@@ -79,7 +85,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 					return node
 				}
 			}
-			node.height = 1 + max(getHeight(node.left), getHeight(node.right))
+			updateHeight(node)
 			return balance(node)
 		}
 
@@ -88,32 +94,33 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 	}
 
 	override fun delete(key: K): AVLNode<K, V>? {
-
-		fun deleteRec(key: K, cur: AVLNode<K, V>?): AVLNode<K, V>? {
-			cur?.let {
-				if (key < it.key) return deleteRec(key, it.left)
-				if (key > it.key) return deleteRec(key, it.right)
-				else {
-					if (it.left == null || it.right == null) {
-						return it.left ?: it.right
-					} else {
-						val predecessor = findMax(it.left) ?: throw NSEE()
-						it.key = predecessor.key
-						it.data = predecessor.data
-						it.left = deleteRec(predecessor.key, it.left)
+		var swappedNode: AVLNode<K, V>? = null
+		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
+			when {
+				node == null -> throw NSEE()
+				key < node.key -> node.left = deleteRec(key, node.left)
+				key > node.key -> node.right = deleteRec(key, node.right)
+				else -> {
+					if (node.left == null || node.right == null) {
+						swappedNode = node.left ?: node.right
+						return swappedNode
 					}
+					val temp = findMax(node.left)
+					node.key = temp?.key ?: throw NSEE()
+					node.data = temp.data
+					swappedNode = node
+					node.left = deleteRec(temp.key, node.left)
 				}
-				updateHeight(it)
-				balance(it)
-				return it
 			}
-			throw NSEE()
+			updateHeight(node)
+			return balance(node)
 		}
 
 		if (key == root?.key) {
 			root = deleteRec(key, root)
 		} else root?.let {
-			return deleteRec(key, it)
+			deleteRec(key, it)
+			return swappedNode
 		}
 		return root
 	}
