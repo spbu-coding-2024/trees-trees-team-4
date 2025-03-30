@@ -4,18 +4,24 @@ const val RED = true
 const val BLACK = false
 
 class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>>(key, data) {
+    /**
+     * A color of a node.
+     */
     var color: Boolean = RED
 }
+/**
+ * 
+ *
+ */
+class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() {
 
-class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>, BinaryTree<K, V, RBNode<K, V>>() {
+    /**
+     * The amount of node in tree.
+     */
     var size = 0
         private set
 
-    fun isEmpty(): Boolean {
-        return root == null
-    }
-
-    fun isRed(node: RBNode<K, V>?): Boolean {
+    private fun isRed(node: RBNode<K, V>?): Boolean {
         return node?.color ?: BLACK
     }
 
@@ -44,20 +50,41 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return x
     }
 
-    override fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
-        var x = super.rotateLeft(node)
-        x.color = node.color
-        node.color = RED
-        return x
+    private fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
+        val x = node.right
+        x?.let {
+            node.right = x.left
+            x.left = node
+            x.color = node.color
+            node.color = RED
+            return x
+        } ?: let {
+            throw NoSuchElementException("Can't rotate left: right node is null")
+        }
     }
 
-    override fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
-        var x = super.rotateRight(node)
-        x.color = node.color
-        node.color = RED
-        return x
+    private fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
+        val x = node.left
+        x?.let {
+            node.left = x.right
+            x.right = node
+            x.color = node.color
+            node.color = RED
+            return x
+        } ?: let {
+            throw NoSuchElementException("Can't rotate right: left node is null")
+        }
     }
 
+    /**
+     * Inserts value with corresponding key.
+
+     * If there's no node with the same key in tree, then create new node.
+     * If there's node with same key, then overwrite value of this node.
+     * @param key a key of a node to be inserted
+     * @param value a value of a node to be inserted
+     * @return the inserted node
+     */
     override fun insert(key: K, value: V): RBNode<K, V> {
         var newNode = RBNode<K,V>(key, value)
         root = insert(root, key, value, newNode)
@@ -107,7 +134,12 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         }
         return x
     }
+    /**
+     * Deletes the minimal element in tree
 
+     * @return the deleted node
+     * @throws NoSuchElementException if there's no nodes in tree
+     */
     fun deleteMin(): RBNode<K,V> {
         root?.let {
             if (!isRed(it.left) && !isRed(it.right)) {
@@ -115,7 +147,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
             }
             var (newRoot, deletedNode) = deleteMin(it)
             root = newRoot
-            if (!isEmpty()) root?.color = BLACK
+            if (root != null) root?.color = BLACK
             size--
             return deletedNode
         } ?:
@@ -125,7 +157,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
     private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
         var x = node
 
-        if (x.left == null) {
+         if (x.left == null) {
             return Pair(null, node)
         }
         if (!isRed(x.left) && !isRed(x.left?.left)) {
@@ -162,12 +194,12 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
                 x = moveRedRight(x)
             }
             if (key == x.key) {
+                val minNode = findMin(x.right)
+                minNode?.let {
+                    x.key = it.key
+                    x.data = it.data
+                } ?: throw error("delete: findMin returns null")
                 x.right?.let {
-                    val minNode = findMin(it)
-                    minNode?.let {
-                        x.key = it.key
-                        x.data = it.data
-                    } ?: throw error("delete: findMin returns null")
                     var returnValue = deleteMin(it)
                     x.right = returnValue.first
                     deletedNode = returnValue.second
@@ -184,22 +216,25 @@ class RedBlackTree<K: Comparable<K>, V : Any>: RotatableTree<K, V, RBNode<K, V>>
         return Pair(balanceNode(x), deletedNode)
     }
 
+    /**
+    * Deletes an element with the given key in tree
+    *
+    * @param key a key of node to be deleted
+    * @return the deleted node
+    * @throws NoSuchElementException if there's no nodes in tree
+    */
     override fun delete(key: K): RBNode<K, V>? {
         root?.let {
-            if (!contains(key)) return null
+            if (search(key) == null) return null
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
             var (newRoot, deletedNode) = delete(it, key)
             root = newRoot
-            if (!isEmpty()) root?.color = BLACK
+            if (root != null) root?.color = BLACK
             size--
             return deletedNode
         } ?:
         throw NoSuchElementException("Nothing to delete")
-    }
-
-    fun contains(k: K): Boolean {
-        return search(k) != null
     }
 }
