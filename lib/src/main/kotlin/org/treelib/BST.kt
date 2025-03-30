@@ -1,20 +1,19 @@
 package org.treelib
 
-class BSTNode<K: Comparable<K>, V: Any>(key: K, data: V) : Node<K, V>(key, data)
+class BSTNode<K: Comparable<K>, V: Any>(key: K, data: V) : Node<K, V, BSTNode<K, V>>(key, data)
 
-class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, data) {
+class BST<K: Comparable<K>, V: Any>(override var root: BSTNode<K, V>? = null) :
+    BinaryTree<K, V, BSTNode<K, V>>(root) {
 
-    override var root: Node<K, V>? = BSTNode(key, data)
-
-    override fun insert(key: K, data: V): Node<K, V> {
+    override fun insert(key: K, data: V): BSTNode<K, V> {
         val resultNode: BSTNode<K, V> = BSTNode(key, data)
-        var currentNode: BSTNode<K, V>? = root as BSTNode<K, V>?
+        var currentNode: BSTNode<K, V>? = root
         while (currentNode?.key != null) {
             currentNode =
                 if (currentNode.key > resultNode.key) {
-                    (currentNode.left ?: break) as BSTNode<K, V>?
+                    (currentNode.left ?: break)
                 } else {
-                    (currentNode.right ?: break) as BSTNode<K, V>?
+                    (currentNode.right ?: break)
             }
         }
         if (currentNode != null) {
@@ -30,59 +29,71 @@ class BST<K: Comparable<K>, V: Any>(key: K, data: V) : BinaryTree<K, V>(key, dat
         return resultNode
     }
 
-    override fun search(key: K): Node<K, V>? {
-        var resultNode: BSTNode<K, V>? = null
-        var currentNode: BSTNode<K, V>? = root as BSTNode<K, V>?
-        while (currentNode?.key != null) {
-            if (currentNode.key > key) {
-                currentNode = (currentNode.left ?: break) as BSTNode<K, V>?
-            } else if (currentNode.key < key) {
-                currentNode = (currentNode.right ?: break) as BSTNode<K, V>?
-            } else {
-                resultNode = currentNode
-            }
-        }
-        return resultNode
-    }
-
-    override fun delete(key: K): Node<K, V>? {
-        var resultNode: BSTNode<K, V>? = root as BSTNode<K, V>?
+    override fun delete(key: K): BSTNode<K, V>? {
+        var resultNode: BSTNode<K, V>? = root
         var currentNode: BSTNode<K, V>? = null
-        var currentRight: BSTNode<K, V>
-        while (true) {
-            if (resultNode?.key == key){
-                if (currentNode?.left == resultNode){
+        var currentRight: BSTNode<K, V>?
+        while (resultNode != null) {
+            // Если нашли нужную ноду
+            if (resultNode.key == key) {
+                // Проверяем, каким из потомков является результирующая. Если null - дерево пустое
+                if (currentNode?.left == resultNode) {
+                    // Подменяем результирующую на ее потомка
                     currentNode.left =
-                        if (resultNode.right == null){
+                        if (resultNode.right == null) {
                             resultNode.left
                         } else if (resultNode.left == null) {
                             resultNode.right
                         } else {
-                            currentRight = resultNode.right as BSTNode<K, V>
-                            while (currentRight.left != null){
-                                currentRight = currentRight.left as BSTNode<K, V>
+                            // Если у результирующей есть оба потомка, фиксируем правого
+                            currentRight = resultNode.right
+                            // и ищем, куда среди его левых потомков можно вставить левого
+                            while (currentRight?.left != null) {
+                                currentRight = currentRight.left
                             }
-                            currentRight.left = resultNode.left as BSTNode<K, V>
+                            if (currentRight != null) {
+                                currentRight.left = resultNode.left
+                            } else {
+                                // Заглушка
+                                resultNode.right = null
+                            }
                             resultNode.right
                         }
-
+                } else if (currentNode?.right == resultNode) {
+                    // Подменяем результирующую на ее потомка
+                    currentNode.right =
+                        if (resultNode.right == null) {
+                            resultNode.left
+                        } else if (resultNode.left == null) {
+                            resultNode.right
+                        } else {
+                            // Если у результирующей есть оба потомка, фиксируем правого
+                            currentRight = resultNode.right
+                            // и ищем, куда среди его левых потомков можно вставить левого
+                            while (currentRight?.left != null) {
+                                currentRight = currentRight.left
+                            }
+                            if (currentRight != null) {
+                                currentRight.left = resultNode.left
+                            } else {
+                                // Заглушка
+                                resultNode.right = null
+                            }
+                            resultNode.right
+                        }
+                } else {
+                    // Если искомый узел - корень, удаляем корень
+                    root = null
                 }
             }
-            if (resultNode?.left == null && resultNode?.right == null){
-                break
+                if (resultNode.key > key) {
+                    currentNode = resultNode
+                    resultNode = resultNode.left ?: break
+                } else if (resultNode.key < key) {
+                    currentNode = resultNode
+                    resultNode = resultNode.right ?: break
+                }
             }
-            if (resultNode.key > key) {
-                currentNode = resultNode
-                resultNode = resultNode.left as BSTNode<K, V>?
-            } else if (resultNode.key > key) {
-                currentNode = resultNode
-                resultNode = resultNode.right as BSTNode<K, V>?
-            }
-        }
         return resultNode
-    }
-
-    override fun iterator(key: K): Iterable<Node<K, V>> {
-        TODO("Not yet implemented")
     }
 }
