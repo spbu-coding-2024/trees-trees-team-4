@@ -53,6 +53,9 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 
 		updateHeight(node)
 		updateHeight(rightChild)
+
+		if (root == node) root = rightChild
+
 		return rightChild
 	}
 
@@ -65,6 +68,9 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 
 		updateHeight(node)
 		updateHeight(leftChild)
+
+		if (root == node) root = leftChild
+
 		return leftChild
 	}
 
