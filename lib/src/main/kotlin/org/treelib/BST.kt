@@ -30,11 +30,11 @@ class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) 
         var target: BSTNode<K, V>? = root
         var current: BSTNode<K, V>? = null
         while (target != null) {
-            // Если нашли нужную ноду
+            // If the target node has been found
             if (target.key == key) {
                 result = target
                 if (current == null) {
-                    // Если currentNode == null, то из корня мы никуда не ушли
+                    // If currentNode == null, then we haven't gone anywhere from the root.
                     root = replaceWithAppending(target, findMin(target.right))
                 } else if (current.left == target) {
                     current.left = replaceWithAppending(target, findMin(target.right))
