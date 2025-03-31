@@ -20,7 +20,8 @@ Each Binary Search Tree have the following features:
 - Iterate elements
 
 AVL and Red-Black tree are self-balancing Binary Search Trees
-Red-Black tree is implemented as left-leaning red-black trees1
+
+Red-Black tree is implemented as left-leaning red-black trees.
 
 ## Building
 
