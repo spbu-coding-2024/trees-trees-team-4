@@ -1,4 +1,3 @@
-
 package org.treelib
 
 abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(internal open var root: N? = null) {
