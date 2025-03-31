@@ -30,6 +30,8 @@ dependencies {
     // Use the JUnit 5 integration.
     testImplementation(libs.junit.jupiter.engine)
 
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 		detekt("io.gitlab.arturbosch.detekt:detekt-cli:1.23.8")

@@ -2,10 +2,32 @@ package org.treelib
 
 import kotlin.math.max
 
+typealias NSEE = NoSuchElementException
+
+const val RIGHT_HEAVY = 2
+const val LEFT_HEAVY = -2
+const val LEFT_RIGHT_HEAVY = 1
+const val RIGHT_LEFT_HEAVY = -1
+
+/**
+ * Represents a node in the AVL tree.
+ *
+ * @param K the type of keys maintained by this node.
+ * @param V the type of mapped values.
+ * @property key the key associated with this node.
+ * @property data the value stored in this node.
+ */
 class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
 	internal var height: Int = 1
 }
 
+/**
+ * An AVL tree that maintains balance through rotations.
+ *
+ * @param K the type of keys maintained by this tree.
+ * @param V the type of mapped values.
+ * @property root the root node of the AVL tree.
+ */
 class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
 
@@ -14,23 +36,26 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 	}
 
 	private fun updateHeight(node: AVLNode<K, V>) {
-		node.height = max(getHeight(node.left), getHeight(node.right))
+		node.height = max(getHeight(node.left), getHeight(node.right)) + 1
 	}
 
 	private fun getBalance(node: AVLNode<K, V>?): Int {
-		return if (node == null) 0 else getHeight(node.left) - getHeight(node.right)
+		return if (node == null) 0 else getHeight(node.right) - getHeight(node.left)
 	}
 
-	private fun balance(node: AVLNode<K, V>) {
+	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
-		if (balance == 2) {
-			if (getBalance(node.right) == -1) node.right?.let { rotateRight(it) }
-			rotateLeft(node)
+		if (balance == RIGHT_HEAVY) {
+			if (getBalance(node.right) == RIGHT_LEFT_HEAVY) node.right =
+				rotateRight(node.right ?: throw NSEE())
+			return rotateLeft(node)
 		}
-		if (balance == -2) {
-			if (getBalance(node.left) == 1) node.left?.let { rotateLeft(it) }
-			rotateRight(node)
+		if (balance == LEFT_HEAVY) {
+			if (getBalance(node.left) == LEFT_RIGHT_HEAVY) node.left =
+				rotateLeft(node.left ?: throw NSEE())
+			return rotateRight(node)
 		}
+		return node
 	}
 
 	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -40,8 +65,11 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.right = middleSubtree
 		rightChild.left = node
 
-		node.height = 1 + max(getHeight(node.left), getHeight(node.right))
-		rightChild.height = 1 + max(getHeight(rightChild.left), getHeight(rightChild.right))
+		updateHeight(node)
+		updateHeight(rightChild)
+
+		if (root == node) root = rightChild
+
 		return rightChild
 	}
 
@@ -52,11 +80,24 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.left = middleSubtree
 		leftChild.right = node
 
-		node.height = 1 + max(getHeight(node.left), getHeight(node.right))
-		leftChild.height = 1 + max(getHeight(leftChild.left), getHeight(leftChild.right))
+		updateHeight(node)
+		updateHeight(leftChild)
+
+		if (root == node) root = leftChild
+
 		return leftChild
 	}
 
+	/**
+	 * Inserts a new node with the specified [key] and [data] into the AVL tree.
+	 *
+	 * If a node with the same key already exists, its data is updated.
+	 * The tree is rebalanced as needed after insertion.
+	 *
+	 * @param key the key to insert.
+	 * @param data the value associated with the key.
+	 * @return the inserted node, or the updated node if the key already exists.
+	 */
 	override fun insert(key: K, data: V): AVLNode<K, V>? {
 		var insertedNode: AVLNode<K, V>? = null
 
@@ -74,50 +115,56 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 					return node
 				}
 			}
-			node.height = 1 + max(getHeight(node.left), getHeight(node.right))
-			val balance = getBalance(node)
-			if (balance > 1) {
-				if (getBalance(node.left) < 0) node.left = rotateLeft(node.left!!)
-				return rotateRight(node)
-			}
-			if (balance < -1) {
-				if (getBalance(node.right) > 0) node.right = rotateRight(node.right!!)
-				return rotateLeft(node)
-			}
-			return node
+			updateHeight(node)
+			return balance(node)
 		}
 
 		root = insertRec(root)
 		return insertedNode
 	}
 
+	/**
+	 * Deletes the node with the specified [key] from the AVL tree.
+	 *
+	 * The tree is rebalanced after deletion. If the node to delete is not found,
+	 * a [NoSuchElementException] is thrown.
+	 *
+	 * Note that if the node being deleted is the root, the root is updated.
+	 * In non-root deletion cases, the function returns the replacement node.
+	 *
+	 * @param key the key of the node to delete.
+	 * @return the new root if the deleted node was the root, or the replacement node otherwise.
+	 * @throws NoSuchElementException if a node with the specified key is not found.
+	 */
 	override fun delete(key: K): AVLNode<K, V>? {
-		if (key == root?.key) {
-			root = delete(key, root)
-		} else root?.let {
-			return delete(key, it)
-		}
-		return root
-	}
-
-	private fun delete(key: K, cur: AVLNode<K, V>?): AVLNode<K, V>? {
-		cur?.let {
-			if (key < it.key) return delete(key, it.left)
-			if (key > it.key) return delete(key, it.right)
-			else {
-				if (it.left == null || it.right == null) {
-					return it.left ?: it.right
-				} else {
-					val predecessor = findMax(it.left) ?: return null
-					it.key = predecessor.key
-					it.data = predecessor.data
-					it.left = delete(predecessor.key, it.left)
+		var swappedNode: AVLNode<K, V>? = null
+		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
+			when {
+				node == null -> throw NSEE()
+				key < node.key -> node.left = deleteRec(key, node.left)
+				key > node.key -> node.right = deleteRec(key, node.right)
+				else -> {
+					if (node.left == null || node.right == null) {
+						swappedNode = node.left ?: node.right
+						return swappedNode
+					}
+					val temp = findMax(node.left)
+					node.key = temp?.key ?: throw NSEE()
+					node.data = temp.data
+					swappedNode = node
+					node.left = deleteRec(temp.key, node.left)
 				}
 			}
-			updateHeight(it)
-			balance(it)
-			return it
+			updateHeight(node)
+			return balance(node)
 		}
-		return null
+
+		if (key == root?.key) {
+			root = deleteRec(key, root)
+		} else root?.let {
+			deleteRec(key, it)
+			return swappedNode
+		}
+		return root
 	}
 }
