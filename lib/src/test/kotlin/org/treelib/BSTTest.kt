@@ -3,17 +3,30 @@ package org.treelib
 import org.junit.jupiter.api.Test
 
 class BSTTest {
+
+    private val tree: BST<Int, Int> = BST()
     @Test
     fun `min of empty tree`(){
-        TODO("Not yet implemented")
+        assert(tree.findMin() == null)
     }
     @Test
     fun `max of empty tree`(){
-        TODO("Not yet implemented")
+        assert(tree.findMax() == null)
+    }
+    @Test
+    fun `insert to empty tree`(){
+        val tree: BST<Int, Int> = BST()
+        assert(tree.findMax() == null)
+    }
+    @Test
+    fun `delete from empty tree`(){
+        val tree: BST<Int, Int> = BST()
+        assert(tree.findMax() == null)
     }
     @Test
     fun `is min of single node tree = max of single node tree`(){
-        TODO("Not yet implemented")
+        val tree: BST<Int, Int> = BST(BSTNode(0, 0))
+        assert(tree.findMin() == tree.findMax())
     }
     @Test
     fun `simple min (int)`(){
