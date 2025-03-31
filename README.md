@@ -1,15 +1,13 @@
 
-# Trees-Trees
+# LES
 
-`trees-trees` is a kotlin library which implements 3 types of Binary Search Trees:
+`LES` is a kotlin library which implements 3 types of Binary Search Trees:
 
 - Basic Binary Search Tree
 - AVL Tree
 - Red-Black Tree
 
-
-
-
+`LES` stands for **L**ibrary of **E**lectronic **S**aplings
 
 ## Features
 
@@ -21,19 +19,21 @@ Each Binary Search Tree have the following features:
 - Find Maximal element
 - Iterate elements
 
-Red-Black tree is implemented as left-leaning red-black trees
+AVL and Red-Black tree are self-balancing Binary Search Trees
+Red-Black tree is implemented as left-leaning red-black trees1
 
+## Building
 
-## Running Tests
+To build library, run the following command:
 
-To run tests, run the following command
-
+```bash
+  ./gradlew build
+```
+This command will run tests:
 ```bash
   ./gradlew test
 ```
 
-
-## Literature 
+## Literature
 - Algorithms, 4th Edition (Robert Sedgewick, Kevin Wayne)
 - Introduction to Algorithms, 3rd Edition (Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest , Clifford Stein)
-
