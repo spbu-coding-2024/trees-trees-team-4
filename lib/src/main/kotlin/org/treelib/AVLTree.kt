@@ -45,17 +45,16 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
-		if (balance == RIGHT_HEAVY) {
-			if (getBalance(node.right) == RIGHT_LEFT_HEAVY) node.right =
-				rotateRight(node.right ?: throw NSEE())
-			return rotateLeft(node)
+		if (balance == RIGHT_HEAVY && getBalance(node.right) == RIGHT_LEFT_HEAVY) {
+			node.right = rotateRight(node.right ?: throw NSEE())
+		} else if (balance == LEFT_HEAVY && getBalance(node.left) == LEFT_RIGHT_HEAVY) {
+			node.left = rotateLeft(node.left ?: throw NSEE())
 		}
-		if (balance == LEFT_HEAVY) {
-			if (getBalance(node.left) == LEFT_RIGHT_HEAVY) node.left =
-				rotateLeft(node.left ?: throw NSEE())
-			return rotateRight(node)
-		}
-		return node
+
+		val rotatedNode = if (balance == RIGHT_HEAVY) rotateLeft(node)
+		else if (balance == LEFT_HEAVY) rotateRight(node) else node
+
+		return rotatedNode
 	}
 
 	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -112,13 +111,12 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 				else -> {
 					node.data = data
 					insertedNode = node
-					return node
 				}
 			}
 			updateHeight(node)
 			return balance(node)
-		}
 
+		}
 		root = insertRec(root)
 		return insertedNode
 	}
