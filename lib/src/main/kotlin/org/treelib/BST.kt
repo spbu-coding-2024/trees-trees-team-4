@@ -7,22 +7,20 @@ class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) 
 
     override fun insert(key: K, data: V): BSTNode<K, V> {
         val resultNode: BSTNode<K, V> = BSTNode(key, data)
+        var parent: BSTNode<K, V>? = null
         var currentNode: BSTNode<K, V>? = root
-        while (currentNode?.key != null) {
-            currentNode = if (currentNode.key > resultNode.key) {
-                currentNode.left
-            } else {
-                currentNode.right
-            } ?: break
+        while (currentNode != null && currentNode.key != key) {
+            parent = currentNode
+            currentNode = stepDeep(currentNode, key)
         }
-        if (currentNode != null) {
-            if (currentNode.key > resultNode.key) {
-                currentNode.left = resultNode
-            } else {
-                currentNode.right = resultNode
+        if (parent != null) {
+            if (parent.key > resultNode.key) {
+                parent.left = replaceByUpdating(parent.left, resultNode)
+            } else if (parent.key < resultNode.key) {
+                parent.right = replaceByUpdating(parent.right, resultNode)
             }
         } else {
-            root = resultNode
+                root = replaceByUpdating(root, resultNode)
         }
         return resultNode
     }
@@ -40,10 +38,8 @@ class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) 
                     root = replaceWithAppending(target, findMin(target.right))
                 } else if (current.left == target) {
                     current.left = replaceWithAppending(target, findMin(target.right))
-                }
-                else
-                    current.right = replaceWithAppending(target, findMin(target.right))
-                break;
+                } else current.right = replaceWithAppending(target, findMin(target.right))
+                break
             }
             current = target
             target = if (target.key > key) {
@@ -66,6 +62,30 @@ class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) 
             }
             target.right
         }
+        return result
+    }
+
+    private fun replaceByUpdating(target: BSTNode<K, V>?, required: BSTNode<K, V>): BSTNode<K, V>{
+        if (target?.key == required.key){
+            target.data = required.data
+            return target
+        }
+        else{
+            return required
+        }
+    }
+
+    private fun stepDeep(node: BSTNode<K, V>, key: K): BSTNode<K, V>? {
+        val result: BSTNode<K, V>? =
+        if (node.key > key) {
+            node.left
+        } else if (node.key < key) {
+            node.right
+        }
+        else {
+            node
+        }
+
         return result
     }
 }
