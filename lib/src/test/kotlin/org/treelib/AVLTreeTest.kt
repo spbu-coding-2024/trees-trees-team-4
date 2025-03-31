@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
+import kotlin.math.abs
 
 class AVLTreeTest {
 	@Test
@@ -128,7 +133,7 @@ class AVLTreeTest {
 	@DisplayName("Delete: nonexistent key")
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
 		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
-		assertNull(tree.delete(42))
+		assertFailsWith<NoSuchElementException> {tree.delete(42)}
 		assertEquals(1, tree.root?.key)
 	}
 
@@ -238,5 +243,70 @@ class AVLTreeTest {
 				assertNotNull(found, "Expected to find key $k")
 				assertEquals(v, found?.data)
 			}
+	}
+
+	class AVLTreeParameterizedTests {
+		private fun height(node: AVLNode<Int, Int>?): Int {
+			return node?.height ?: 0
+		}
+
+		private fun isBalanced(node: AVLNode<Int, Int>?): Boolean {
+			return if (node == null) true else if (abs(height(node.left) - height(node.right)) > 1) false
+			else isBalanced(node.left) && isBalanced(node.right)
+		}
+
+		private fun inOrder(node: AVLNode<Int, Int>?): List<Int> {
+			return if (node == null) emptyList() else inOrder(node.left) + listOf(node.key) + inOrder(node.right)
+		}
+
+		companion object {
+			@JvmStatic
+			fun listProvider(): Stream<List<Int>> {
+				return Stream.of(
+					emptyList(),
+					listOf(1),
+					listOf(3, 2, 1),
+					listOf(5, 2, 8, 1, 3),
+					(1..20).toList().shuffled(),
+					(1..100).toList().shuffled()
+				)
+			}
+		}
+
+		@ParameterizedTest(name = "In-order traversal returns sorted keys for list: {0}")
+		@MethodSource("listProvider")
+		fun inorderTraversalReturnsSortedKeys(list: List<Int>) {
+			val tree = AVLTree<Int, Int>()
+			list.forEach { key -> tree.insert(key, key) }
+			val inOrderKeys = inOrder(tree.root)
+			assertEquals(inOrderKeys.sorted(), inOrderKeys, "In-order traversal should be sorted")
+		}
+
+		@ParameterizedTest(name = "Search returns correct values for list: {0}")
+		@MethodSource("listProvider")
+		fun searchShouldReturnCorrectValuesForInsertedKeys(list: List<Int>) {
+			val tree = AVLTree<Int, Int>()
+			list.forEach { key -> tree.insert(key, key * 2) }
+			list.forEach { key ->
+				val node = tree.search(key)
+				assertNotNull(node, "Node with key $key should be found")
+				assertEquals(key * 2, node!!.data, "For key $key, expected value ${key * 2}")
+			}
+		}
+
+		@ParameterizedTest(name = "Tree remains balanced after insertions and deletions for list: {0}")
+		@MethodSource("listProvider")
+		fun treeShouldRemainBalancedAfterInsertionsAndDeletions(list: List<Int>) {
+			val tree = AVLTree<Int, Int>()
+			list.forEach { key -> tree.insert(key, key) }
+			assertTrue(isBalanced(tree.root), "Tree should be balanced after insertions")
+			val uniqueSorted = list.toSet().sorted()
+			uniqueSorted.forEachIndexed { index, key ->
+				if (index % 2 == 0) {
+					tree.delete(key)
+					assertTrue(isBalanced(tree.root), "Tree should remain balanced after deleting key $key")
+				}
+			}
+		}
 	}
 }

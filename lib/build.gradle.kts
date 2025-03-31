@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    jacoco
-    `java-library`
+    id("jacoco")
+    id("java-library")
+    id("org.jetbrains.dokka") version "2.0.0"
 }
 
 repositories {
@@ -28,6 +29,8 @@ dependencies {
 
     // Use the JUnit 5 integration.
     testImplementation(libs.junit.jupiter.engine)
+
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
