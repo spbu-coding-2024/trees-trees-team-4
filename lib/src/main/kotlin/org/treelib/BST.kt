@@ -1,10 +1,34 @@
 package org.treelib
 
+/**
+ * Represents a node in the binary search tree.
+ *
+ * @param K the type of keys maintained by this node.
+ * @param V the type of mapped values.
+ * @property key the key associated with this node.
+ * @property data the value stored in this node.
+ */
 class BSTNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, BSTNode<K, V>>(key, data)
 
+/**
+ * Binary search tree that stores key-value pairs in a sorted order, allowing efficient search, insertion, and deletion.
+ *
+ * @param K the type of keys maintained by this tree. Keys must be comparable.
+ * @param V the type of mapped values.
+ * @property root the root node of the binary search tree, or null if the tree is empty.
+ */
 class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) :
     BinaryTree<K, V, BSTNode<K, V>>(root) {
 
+    /**
+     * Inserts a new node with the specified [key] and [data] into the binary search tree.
+     *
+     * If a node with the same key already exists, its data is updated.
+     *
+     * @param key a key of a node to be inserted
+     * @param data a value of a node to be inserted
+     * @return the inserted node, or the updated node if node with that key already exists.
+     */
     override fun insert(key: K, data: V): BSTNode<K, V> {
         val resultNode: BSTNode<K, V> = BSTNode(key, data)
         var parent: BSTNode<K, V>? = null
@@ -25,6 +49,12 @@ class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) 
         return resultNode
     }
 
+    /**
+     * Deletes the node with the specified [key] from the AVL tree.
+     *
+     * @param key the key of the node to be deleted.
+     * @return the deleted node or null, if impossible to find such node
+     */
     override fun delete(key: K): BSTNode<K, V>? {
         var result: BSTNode<K, V>? = root
         var target: BSTNode<K, V>? = root
