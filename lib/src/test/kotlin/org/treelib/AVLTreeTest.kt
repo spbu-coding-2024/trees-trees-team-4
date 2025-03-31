@@ -251,11 +251,8 @@ class AVLTreeTest {
 		}
 
 		private fun isBalanced(node: AVLNode<Int, Int>?): Boolean {
-			if (node == null) return true
-			val leftHeight = height(node.left)
-			val rightHeight = height(node.right)
-			if (abs(leftHeight - rightHeight) > 1) return false
-			return isBalanced(node.left) && isBalanced(node.right)
+			return if (node == null) true else if (abs(height(node.left) - height(node.right)) > 1) false
+			else isBalanced(node.left) && isBalanced(node.right)
 		}
 
 		private fun inOrder(node: AVLNode<Int, Int>?): List<Int> {
