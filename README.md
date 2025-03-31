@@ -1,15 +1,13 @@
 
-# Trees-Trees
+# LES
 
-`trees-trees` is a kotlin library which implements 3 types of Binary Search Trees:
+`LES` is a kotlin library which implements 3 types of Binary Search Trees:
 
 - Basic Binary Search Tree
 - AVL Tree
 - Red-Black Tree
 
-
-
-
+`LES` stands for **L**ibrary of **E**lectronic **S**aplings
 
 ## Features
 
