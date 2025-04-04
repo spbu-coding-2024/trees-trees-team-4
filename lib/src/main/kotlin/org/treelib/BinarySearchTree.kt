@@ -17,7 +17,7 @@ class BSTNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, BSTNode<
  * @param V the type of mapped values.
  * @property root the root node of the binary search tree, or null if the tree is empty.
  */
-class BST<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) :
+class BinarySearchTree<K : Comparable<K>, V : Any>(override var root: BSTNode<K, V>? = null) :
     BinaryTree<K, V, BSTNode<K, V>>(root) {
 
     /**
