@@ -37,14 +37,10 @@ class BinarySearchTree<K : Comparable<K>, V : Any>(override var root: BSTNode<K,
             parent = currentNode
             currentNode = stepDeep(currentNode, key)
         }
-        if (parent != null) {
-            if (parent.key > resultNode.key) {
-                parent.left = replaceByUpdating(parent.left, resultNode)
-            } else if (parent.key < resultNode.key) {
-                parent.right = replaceByUpdating(parent.right, resultNode)
-            }
-        } else {
-                root = replaceByUpdating(root, resultNode)
+        when {
+            parent == null -> root = replaceByUpdating(root, resultNode)
+            parent.key > resultNode.key -> parent.left = replaceByUpdating(parent.left, resultNode)
+            else -> parent.right = replaceByUpdating(parent.right, resultNode)
         }
         return resultNode
     }
@@ -63,35 +59,29 @@ class BinarySearchTree<K : Comparable<K>, V : Any>(override var root: BSTNode<K,
             // If the target node has been found
             if (target.key == key) {
                 result = target
-                if (current == null) {
-                    // If currentNode == null, then we haven't gone anywhere from the root.
-                    root = replaceWithAppending(target, findMin(target.right))
-                } else if (current.left == target) {
-                    current.left = replaceWithAppending(target, findMin(target.right))
-                } else current.right = replaceWithAppending(target, findMin(target.right))
+                when{
+                    current == null -> root = replaceWithAppending(target, findMin(target.right))
+                    current.left == target -> current.left = replaceWithAppending(target, findMin(target.right))
+                    else -> current.right = replaceWithAppending(target, findMin(target.right))
+                }
                 break
             }
             current = target
-            target = if (target.key > key) {
-                target.left
-            } else {
-                target.right
-            }
+            target = if (target.key > key) target.left else target.right
         }
         return result
     }
 
     private fun replaceWithAppending(target: BSTNode<K, V>, required: BSTNode<K, V>?): BSTNode<K, V>? {
-        val result: BSTNode<K, V>? = if (target.right == null) {
-            target.left
-        } else if (target.left == null) {
-            target.right
-        } else {
-            if (required != null) {
-                required.left = target.left
+        val result: BSTNode<K, V>? = when {
+                target.right == null -> target.left
+                target.left == null -> target.right
+                required != null -> {
+                    required.left = target.left
+                    target.right
+                }
+                else -> target.right
             }
-            target.right
-        }
         return result
     }
 
@@ -107,14 +97,12 @@ class BinarySearchTree<K : Comparable<K>, V : Any>(override var root: BSTNode<K,
 
     private fun stepDeep(node: BSTNode<K, V>, key: K): BSTNode<K, V>? {
         val result: BSTNode<K, V>? =
-        if (node.key > key) {
-            node.left
-        } else if (node.key < key) {
-            node.right
-        }
-        else {
-            node
-        }
+            when
+            {
+                node.key > key -> node.left
+                node.key < key -> node.right
+                else -> node
+            }
 
         return result
     }
