@@ -28,7 +28,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Insert: single node")
 	fun insert_singleNode_returnsNewNodeAndSetsRoot() {
-		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
+		val tree = AVLTree(1, "one")
 		tree.insert(10, "ten")
 		val inserted = tree.search(10)
 		assertNotNull(inserted)
@@ -40,7 +40,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Insert: right rotation")
 	fun insert_rightRotation() {
-		val tree = AVLTree<Int, String>(AVLNode(3, "three"))
+		val tree = AVLTree(3, "three")
 		tree.insert(2, "two")
 		tree.insert(1, "one")
 		assertEquals(2, tree.root?.key)
@@ -90,7 +90,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: delete root")
 	fun delete_rootDelete() {
-		val tree = AVLTree<Int, String>(AVLNode(5, "five"))
+		val tree = AVLTree(5, "five")
 		tree.delete(5)
 		assertNull(tree.root)
 	}
@@ -98,7 +98,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: one child")
 	fun delete_oneChild() {
-		val tree = AVLTree(AVLNode(1, "one"))
+		val tree = AVLTree(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
 		tree.insert(4, "four")
@@ -112,7 +112,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: two children")
 	fun delete_nodeWithTwoChildren_replacesWithPredecessor() {
-		val tree = AVLTree<Int, String>(AVLNode(10, "ten"))
+		val tree = AVLTree(10, "ten")
 		tree.insert(5, "five")
 		tree.insert(15, "fifteen")
 		tree.insert(7, "seven")
@@ -124,7 +124,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: nonexistent key")
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
-		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
+		val tree = AVLTree(1, "one")
 		assertFailsWith<NoSuchElementException> { tree.delete(42) }
 		assertEquals(1, tree.root?.key)
 	}
@@ -230,7 +230,7 @@ class AVLTreeTest {
 	}
 
 	class AVLTreeParameterizedTests {
-		private fun height(node: AVLNode<Int, Int>?): Int {
+		private fun height(node: AVLNode<Int, Int?>?): Int {
 			return node?.height ?: 0
 		}
 
@@ -242,7 +242,7 @@ class AVLTreeTest {
 			}
 		}
 
-		private fun inOrder(node: AVLNode<Int, Int>?): List<Int> {
+		private fun inOrder(node: AVLNode<Int, Int?>?): List<Int> {
 			return if (node == null) emptyList() else inOrder(node.left) + listOf(node.key) + inOrder(node.right)
 		}
 

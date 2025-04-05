@@ -10,7 +10,7 @@ import kotlin.math.max
  * @property key the key associated with this node.
  * @property data the data stored in this node.
  */
-class AVLNode<K : Comparable<K>, D : Any>(key: K, data: D) : Node<K, D, AVLNode<K, D>>(key, data) {
+class AVLNode<K : Comparable<K>, D : Any?>(key: K, data: D?) : Node<K, D?, AVLNode<K, D?>>(key, data) {
 	var height: Int = 1
 		private set
 
@@ -26,8 +26,13 @@ class AVLNode<K : Comparable<K>, D : Any>(key: K, data: D) : Node<K, D, AVLNode<
  * @param D the type of mapped data.
  * @property root the root node of the AVL tree.
  */
-class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
-	BinaryTree<K, D, AVLNode<K, D>>(root) {
+class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = null):
+	BinaryTree<K, D?, AVLNode<K, D?>>() {
+
+	init {
+		if (rootKey != null)
+			root = AVLNode(rootKey, rootData)
+	}
 
 	enum class Weight(val value: Int) {
 		BALANCED(0),
@@ -37,14 +42,14 @@ class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
 		RIGHT_LEFT_HEAVY(-1)
 	}
 
-	private fun rotateHelper(node: AVLNode<K, D>, child: AVLNode<K, D>) {
+	private fun rotateHelper(node: AVLNode<K, D?>, child: AVLNode<K, D?>) {
 		node.updateHeight()
 		child.updateHeight()
 		if (root == node)
 			root = child
 	}
 
-	private fun rotateLeft(node: AVLNode<K, D>): AVLNode<K, D> {
+	private fun rotateLeft(node: AVLNode<K, D?>): AVLNode<K, D?> {
 		val rightChild = node.right ?: return node
 		val middleSubtree = rightChild.left
 
@@ -55,7 +60,7 @@ class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
 		return rightChild
 	}
 
-	private fun rotateRight(node: AVLNode<K, D>): AVLNode<K, D> {
+	private fun rotateRight(node: AVLNode<K, D?>): AVLNode<K, D?> {
 		val leftChild = node.left ?: return node
 		val middleSubtree = leftChild.right
 
@@ -66,17 +71,17 @@ class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
 		return leftChild
 	}
 
-	private fun balance(node: AVLNode<K, D>): AVLNode<K, D> {
+	private fun balance(node: AVLNode<K, D?>): AVLNode<K, D?> {
 		fun Int.toWeight(): Weight {
 			return Weight.entries.find { it.value == this }
 				?: throw IllegalArgumentException("Cannot find weight: $this")
 		}
 
-		fun getHeight(node: AVLNode<K, D>?): Int {
+		fun getHeight(node: AVLNode<K, D?>?): Int {
 			return node?.height ?: 0
 		}
 
-		fun getBalanceFactor(node: AVLNode<K, D>?): Weight {
+		fun getBalanceFactor(node: AVLNode<K, D?>?): Weight {
 			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
 		}
 
@@ -111,20 +116,16 @@ class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
 	 * @param key the key to insert.
 	 * @param data the data associated with the key.
 	 */
-	override fun insert(key: K, data: D) {
-		var insertedNode: AVLNode<K, D>?
-
-		fun insertRec(node: AVLNode<K, D>?): AVLNode<K, D>? {
+	override fun insert(key: K, data: D?) {
+		fun insertRec(node: AVLNode<K, D?>?): AVLNode<K, D?> {
 			if (node == null) {
-				insertedNode = AVLNode(key, data)
-				return insertedNode
+				return AVLNode(key, data)
 			}
 			when {
 				key < node.key -> node.left = insertRec(node.left)
 				key > node.key -> node.right = insertRec(node.right)
 				else -> {
 					node.data = data
-					insertedNode = node
 				}
 			}
 			node.updateHeight()
@@ -146,7 +147,7 @@ class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
 	 * @throws NoSuchElementException if a node with the specified key is not found.
 	 */
 	override fun delete(key: K) {
-		fun deleteRec(key: K, node: AVLNode<K, D>?): AVLNode<K, D>? {
+		fun deleteRec(key: K, node: AVLNode<K, D?>?): AVLNode<K, D?>? {
 			when {
 				node == null -> throw NoSuchElementException("Cannot find node to be deleted: key = $key")
 				key < node.key -> node.left = deleteRec(key, node.left)
