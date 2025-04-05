@@ -2,10 +2,6 @@ package org.treelib
 
 import kotlin.math.max
 
-const val RIGHT_HEAVY = 2
-const val LEFT_HEAVY = -2
-const val LEFT_RIGHT_HEAVY = 1
-const val RIGHT_LEFT_HEAVY = -1
 
 /**
  * Represents a node in the AVL tree.
@@ -28,6 +24,20 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
  */
 class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
+	enum class Weight(val value: Int) {
+		BALANCED(0),
+		RIGHT_HEAVY(2),
+		LEFT_HEAVY(-2),
+		LEFT_RIGHT_HEAVY(1),
+		RIGHT_LEFT_HEAVY(-1)
+	}
+
+	private fun Int.toWeight(): Weight =
+		Weight.entries.find { it.value == this } ?: throw IllegalArgumentException("Cannot find weight")
+
+	private fun getBalance(node: AVLNode<K, V>?): Weight {
+		return if (node == null) Weight.BALANCED else (getHeight(node.right) - getHeight(node.left)).toWeight()
+	}
 
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: 0
@@ -37,20 +47,22 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.height = max(getHeight(node.left), getHeight(node.right)) + 1
 	}
 
-	private fun getBalance(node: AVLNode<K, V>?): Int {
-		return if (node == null) 0 else getHeight(node.right) - getHeight(node.left)
-	}
-
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
-		if (balance == RIGHT_HEAVY && getBalance(node.right) == RIGHT_LEFT_HEAVY) {
-			node.right = rotateRight(node.right ?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree"))
-		} else if (balance == LEFT_HEAVY && getBalance(node.left) == LEFT_RIGHT_HEAVY) {
-			node.left = rotateLeft(node.left ?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree"))
+		if (balance == Weight.RIGHT_HEAVY && getBalance(node.right) == Weight.RIGHT_LEFT_HEAVY) {
+			node.right = rotateRight(
+				node.right
+					?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree")
+			)
+		} else if (balance == Weight.LEFT_HEAVY && getBalance(node.left) == Weight.LEFT_RIGHT_HEAVY) {
+			node.left = rotateLeft(
+				node.left
+					?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree")
+			)
 		}
 
-		val rotatedNode = if (balance == RIGHT_HEAVY) rotateLeft(node)
-		else if (balance == LEFT_HEAVY) rotateRight(node) else node
+		val rotatedNode = if (balance == Weight.RIGHT_HEAVY) rotateLeft(node)
+		else if (balance == Weight.LEFT_HEAVY) rotateRight(node) else node
 
 		return rotatedNode
 	}
