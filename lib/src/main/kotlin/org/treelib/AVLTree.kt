@@ -38,16 +38,25 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		RIGHT_LEFT_HEAVY(-1)
 	}
 
-	private fun Int.toWeight(): Weight =
-		Weight.entries.find { it.value == this } ?: throw IllegalArgumentException("Cannot find weight")
-
-	private fun getHeight(node: AVLNode<K, V>?): Int {
-		return node?.height ?: 0
-	}
-
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
+		fun Int.toWeight(): Weight{
+			return Weight.entries.find { it.value == this }
+				?: throw IllegalArgumentException("Cannot find weight: $this")
+		}
+
+		fun getHeight(node: AVLNode<K, V>?): Int {
+			return node?.height ?: 0
+		}
+
 		fun getBalanceFactor(node: AVLNode<K, V>?): Weight {
 			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
+		}
+
+		fun rotateHelper(node: AVLNode<K, V>, child: AVLNode<K, V>){
+			node.updateHeight()
+			child.updateHeight()
+			if (root == node)
+				root = child
 		}
 
 		fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -57,11 +66,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			node.right = middleSubtree
 			rightChild.left = node
 
-			node.updateHeight()
-			rightChild.updateHeight()
-
-			if (root == node) root = rightChild
-
+			rotateHelper(node, rightChild)
 			return rightChild
 		}
 
@@ -72,13 +77,10 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			node.left = middleSubtree
 			leftChild.right = node
 
-			node.updateHeight()
-			leftChild.updateHeight()
-
-			if (root == node) root = leftChild
-
+			rotateHelper(node, leftChild)
 			return leftChild
 		}
+
 
 		val nodeBalance = getBalanceFactor(node)
 		if (nodeBalance == Weight.RIGHT_HEAVY && getBalanceFactor(node.right) == Weight.RIGHT_LEFT_HEAVY) {
@@ -153,7 +155,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		var swappedNode: AVLNode<K, V>? = null
 		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
 			when {
-				node == null -> throw NoSuchElementException("Cannot find node to be deleted")
+				node == null -> throw NoSuchElementException("Cannot find node to be deleted: key = $key")
 				key < node.key -> node.left = deleteRec(key, node.left)
 				key > node.key -> node.right = deleteRec(key, node.right)
 				else -> {
