@@ -18,8 +18,6 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 	fun updateHeight() {
 		height = max(left?.height ?: 0, right?.height ?: 0) + 1
 	}
-
-
 }
 
 /**
@@ -29,7 +27,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
  * @param V the type of mapped values.
  * @property root the root node of the AVL tree.
  */
-class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = null) :
+class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
 
 	enum class Weight(val value: Int) {
