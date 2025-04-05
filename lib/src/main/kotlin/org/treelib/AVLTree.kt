@@ -30,12 +30,41 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
 
-	private enum class Weight(val value: Int) {
+	enum class Weight(val value: Int) {
 		BALANCED(0),
 		RIGHT_HEAVY(2),
 		LEFT_HEAVY(-2),
 		LEFT_RIGHT_HEAVY(1),
 		RIGHT_LEFT_HEAVY(-1)
+	}
+
+	private fun rotateHelper(node: AVLNode<K, V>, child: AVLNode<K, V>){
+		node.updateHeight()
+		child.updateHeight()
+		if (root == node)
+			root = child
+	}
+
+	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
+		val rightChild = node.right ?: return node
+		val middleSubtree = rightChild.left
+
+		node.right = middleSubtree
+		rightChild.left = node
+
+		rotateHelper(node, rightChild)
+		return rightChild
+	}
+
+	private fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
+		val leftChild = node.left ?: return node
+		val middleSubtree = leftChild.right
+
+		node.left = middleSubtree
+		leftChild.right = node
+
+		rotateHelper(node, leftChild)
+		return leftChild
 	}
 
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -51,36 +80,6 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		fun getBalanceFactor(node: AVLNode<K, V>?): Weight {
 			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
 		}
-
-		fun rotateHelper(node: AVLNode<K, V>, child: AVLNode<K, V>){
-			node.updateHeight()
-			child.updateHeight()
-			if (root == node)
-				root = child
-		}
-
-		fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
-			val rightChild = node.right ?: return node
-			val middleSubtree = rightChild.left
-
-			node.right = middleSubtree
-			rightChild.left = node
-
-			rotateHelper(node, rightChild)
-			return rightChild
-		}
-
-		fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
-			val leftChild = node.left ?: return node
-			val middleSubtree = leftChild.right
-
-			node.left = middleSubtree
-			leftChild.right = node
-
-			rotateHelper(node, leftChild)
-			return leftChild
-		}
-
 
 		val nodeBalance = getBalanceFactor(node)
 		if (nodeBalance == Weight.RIGHT_HEAVY && getBalanceFactor(node.right) == Weight.RIGHT_LEFT_HEAVY) {
