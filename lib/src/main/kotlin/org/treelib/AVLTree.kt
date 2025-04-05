@@ -12,7 +12,14 @@ import kotlin.math.max
  * @property data the value stored in this node.
  */
 class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
-	internal var height: Int = 1
+	var height: Int = 1
+		private set
+
+	fun updateHeight() {
+		height = max(left?.height ?: 0, right?.height ?: 0) + 1
+	}
+
+
 }
 
 /**
@@ -24,6 +31,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
  */
 class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
+
 	enum class Weight(val value: Int) {
 		BALANCED(0),
 		RIGHT_HEAVY(2),
@@ -41,10 +49,6 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 
 	private fun getHeight(node: AVLNode<K, V>?): Int {
 		return node?.height ?: 0
-	}
-
-	private fun updateHeight(node: AVLNode<K, V>) {
-		node.height = max(getHeight(node.left), getHeight(node.right)) + 1
 	}
 
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
@@ -74,8 +78,8 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.right = middleSubtree
 		rightChild.left = node
 
-		updateHeight(node)
-		updateHeight(rightChild)
+		node.updateHeight()
+		rightChild.updateHeight()
 
 		if (root == node) root = rightChild
 
@@ -89,8 +93,8 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		node.left = middleSubtree
 		leftChild.right = node
 
-		updateHeight(node)
-		updateHeight(leftChild)
+		node.updateHeight()
+		leftChild.updateHeight()
 
 		if (root == node) root = leftChild
 
@@ -123,7 +127,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 					insertedNode = node
 				}
 			}
-			updateHeight(node)
+			node.updateHeight()
 			return balance(node)
 
 		}
@@ -164,7 +168,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 					node.left = deleteRec(temp.key, node.left)
 				}
 			}
-			updateHeight(node)
+			node.updateHeight()
 			return balance(node)
 		}
 
