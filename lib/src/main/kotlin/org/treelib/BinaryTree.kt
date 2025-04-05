@@ -1,13 +1,15 @@
 package org.treelib
 
-abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(internal open var root: N? = null) {
+abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
+	var root: N? = null
+		protected set
+
 	fun findMin(start: N? = root): N? {
 		var resultNode = start ?: return null
 		while (true) {
 			resultNode = resultNode.left ?: return resultNode
 		}
 	}
-
 
 	fun findMax(start: N? = root): N? {
 		var resultNode = start ?: return null
@@ -28,13 +30,13 @@ abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(interna
 		return null
 	}
 
-	abstract fun insert(key: K, data: V): N?
-	abstract fun delete(key: K): N?
-	fun iterator(): Iterator<V> = iterator {
+	abstract fun insert(key: K, data: D?)
+	abstract fun delete(key: K)
+	operator fun iterator(): Iterator<D?> = iterator {
 		inorder(root)
 	}
 
-	private suspend fun SequenceScope<V>.inorder(node: Node<K, V, N>?) {
+	private suspend fun SequenceScope<D?>.inorder(node: Node<K, D?, N>?) {
 		if (node != null) {
 			inorder(node.left)
 			yield(node.data)
@@ -42,7 +44,7 @@ abstract class BinaryTree<K : Comparable<K>, V : Any, N : Node<K, V, N>>(interna
 		}
 	}
 
-	fun next(): V {
+	fun next(): D? {
 		return iterator().next()
 	}
 
