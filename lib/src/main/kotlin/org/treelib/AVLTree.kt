@@ -7,9 +7,9 @@ import kotlin.math.max
  * Represents a node in the AVL tree.
  *
  * @param K the type of keys maintained by this node.
- * @param V the type of mapped values.
+ * @param V the type of mapped data.
  * @property key the key associated with this node.
- * @property data the value stored in this node.
+ * @property data the data stored in this node.
  */
 class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
 	var height: Int = 1
@@ -24,7 +24,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
  * An AVL tree that maintains balance through rotations.
  *
  * @param K the type of keys maintained by this tree.
- * @param V the type of mapped values.
+ * @param V the type of mapped data.
  * @property root the root node of the AVL tree.
  */
 class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
@@ -106,7 +106,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	 * The tree is rebalanced as needed after insertion.
 	 *
 	 * @param key the key to insert.
-	 * @param data the value associated with the key.
+	 * @param data the data associated with the key.
 	 * @return the inserted node, or the updated node if the key already exists.
 	 */
 	override fun insert(key: K, data: V): AVLNode<K, V>? {
