@@ -2,8 +2,6 @@ package org.treelib
 
 import kotlin.math.max
 
-typealias NSEE = NoSuchElementException
-
 const val RIGHT_HEAVY = 2
 const val LEFT_HEAVY = -2
 const val LEFT_RIGHT_HEAVY = 1
@@ -46,9 +44,9 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		val balance = getBalance(node)
 		if (balance == RIGHT_HEAVY && getBalance(node.right) == RIGHT_LEFT_HEAVY) {
-			node.right = rotateRight(node.right ?: throw NSEE())
+			node.right = rotateRight(node.right ?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree"))
 		} else if (balance == LEFT_HEAVY && getBalance(node.left) == LEFT_RIGHT_HEAVY) {
-			node.left = rotateLeft(node.left ?: throw NSEE())
+			node.left = rotateLeft(node.left ?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree"))
 		}
 
 		val rotatedNode = if (balance == RIGHT_HEAVY) rotateLeft(node)
@@ -138,7 +136,7 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 		var swappedNode: AVLNode<K, V>? = null
 		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
 			when {
-				node == null -> throw NSEE()
+				node == null -> throw NoSuchElementException("Cannot find node to be deleted")
 				key < node.key -> node.left = deleteRec(key, node.left)
 				key > node.key -> node.right = deleteRec(key, node.right)
 				else -> {
@@ -147,7 +145,8 @@ class AVLTree<K : Comparable<K>, V : Any>(override var root: AVLNode<K, V>? = nu
 						return swappedNode
 					}
 					val temp = findMax(node.left)
-					node.key = temp?.key ?: throw NSEE()
+					node.key = temp?.key
+						?: throw NoSuchElementException("Cannot find the predecessor of the node to be deleted")
 					node.data = temp.data
 					swappedNode = node
 					node.left = deleteRec(temp.key, node.left)
