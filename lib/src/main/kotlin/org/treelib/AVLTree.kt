@@ -50,56 +50,56 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
 		}
 
-		val balance = getBalanceFactor(node)
-		if (balance == Weight.RIGHT_HEAVY && getBalanceFactor(node.right) == Weight.RIGHT_LEFT_HEAVY) {
+		fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
+			val rightChild = node.right ?: return node
+			val middleSubtree = rightChild.left
+
+			node.right = middleSubtree
+			rightChild.left = node
+
+			node.updateHeight()
+			rightChild.updateHeight()
+
+			if (root == node) root = rightChild
+
+			return rightChild
+		}
+
+		fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
+			val leftChild = node.left ?: return node
+			val middleSubtree = leftChild.right
+
+			node.left = middleSubtree
+			leftChild.right = node
+
+			node.updateHeight()
+			leftChild.updateHeight()
+
+			if (root == node) root = leftChild
+
+			return leftChild
+		}
+
+		val nodeBalance = getBalanceFactor(node)
+		if (nodeBalance == Weight.RIGHT_HEAVY && getBalanceFactor(node.right) == Weight.RIGHT_LEFT_HEAVY) {
 			node.right = rotateRight(
 				node.right
 					?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree")
 			)
-		} else if (balance == Weight.LEFT_HEAVY && getBalanceFactor(node.left) == Weight.LEFT_RIGHT_HEAVY) {
+		} else if (nodeBalance == Weight.LEFT_HEAVY && getBalanceFactor(node.left) == Weight.LEFT_RIGHT_HEAVY) {
 			node.left = rotateLeft(
 				node.left
 					?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree")
 			)
 		}
 
-		val rotatedNode = when (balance) {
+		val rotatedNode = when (nodeBalance) {
 			Weight.RIGHT_HEAVY -> rotateLeft(node)
 			Weight.LEFT_HEAVY -> rotateRight(node)
 			else -> node
 		}
 
 		return rotatedNode
-	}
-
-	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
-		val rightChild = node.right ?: return node
-		val middleSubtree = rightChild.left
-
-		node.right = middleSubtree
-		rightChild.left = node
-
-		node.updateHeight()
-		rightChild.updateHeight()
-
-		if (root == node) root = rightChild
-
-		return rightChild
-	}
-
-	private fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
-		val leftChild = node.left ?: return node
-		val middleSubtree = leftChild.right
-
-		node.left = middleSubtree
-		leftChild.right = node
-
-		node.updateHeight()
-		leftChild.updateHeight()
-
-		if (root == node) root = leftChild
-
-		return leftChild
 	}
 
 	/**
