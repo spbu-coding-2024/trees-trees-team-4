@@ -47,7 +47,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 
 	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
 		fun getBalanceFactor(node: AVLNode<K, V>?): Weight {
-			return if (node == null) Weight.BALANCED else (getHeight(node.right) - getHeight(node.left)).toWeight()
+			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
 		}
 
 		val balance = getBalanceFactor(node)
