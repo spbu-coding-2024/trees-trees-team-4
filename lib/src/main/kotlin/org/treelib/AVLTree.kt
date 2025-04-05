@@ -160,11 +160,13 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 					if (node.left == null || node.right == null) {
 						return node.left ?: node.right
 					}
-					val temp = findMax(node.left)
-					node.key = temp?.key
-						?: throw NoSuchElementException("Cannot find the predecessor of the node to be deleted")
-					node.data = temp.data
-					node.left = deleteRec(temp.key, node.left)
+					val predecessor = findMax(node.left)
+					node.key = predecessor?.key
+						?: throw NoSuchElementException(
+							"Cannot find the predecessor of the node to be deleted: key = $key"
+						)
+					node.data = predecessor.data
+					node.left = deleteRec(predecessor.key, node.left)
 				}
 			}
 			node.updateHeight()
