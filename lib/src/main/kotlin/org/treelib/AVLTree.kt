@@ -30,7 +30,7 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
 class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	BinaryTree<K, V, AVLNode<K, V>>(root) {
 
-	enum class Weight(val value: Int) {
+	private enum class Weight(val value: Int) {
 		BALANCED(0),
 		RIGHT_HEAVY(2),
 		LEFT_HEAVY(-2),
@@ -114,8 +114,8 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	 * @param data the data associated with the key.
 	 * @return the inserted node, or the updated node if the key already exists.
 	 */
-	override fun insert(key: K, data: V): AVLNode<K, V>? {
-		var insertedNode: AVLNode<K, V>? = null
+	override fun insert(key: K, data: V) {
+		var insertedNode: AVLNode<K, V>?
 
 		fun insertRec(node: AVLNode<K, V>?): AVLNode<K, V>? {
 			if (node == null) {
@@ -135,7 +135,6 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 
 		}
 		root = insertRec(root)
-		return insertedNode
 	}
 
 	/**
@@ -151,8 +150,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	 * @return the new root if the deleted node was the root, or the replacement node otherwise.
 	 * @throws NoSuchElementException if a node with the specified key is not found.
 	 */
-	override fun delete(key: K): AVLNode<K, V>? {
-		var swappedNode: AVLNode<K, V>? = null
+	override fun delete(key: K) {
 		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
 			when {
 				node == null -> throw NoSuchElementException("Cannot find node to be deleted: key = $key")
@@ -160,14 +158,12 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 				key > node.key -> node.right = deleteRec(key, node.right)
 				else -> {
 					if (node.left == null || node.right == null) {
-						swappedNode = node.left ?: node.right
-						return swappedNode
+						return node.left ?: node.right
 					}
 					val temp = findMax(node.left)
 					node.key = temp?.key
 						?: throw NoSuchElementException("Cannot find the predecessor of the node to be deleted")
 					node.data = temp.data
-					swappedNode = node
 					node.left = deleteRec(temp.key, node.left)
 				}
 			}
@@ -179,8 +175,6 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			root = deleteRec(key, root)
 		} else root?.let {
 			deleteRec(key, it)
-			return swappedNode
 		}
-		return root
 	}
 }
