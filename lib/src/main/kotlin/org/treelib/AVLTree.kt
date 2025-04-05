@@ -63,8 +63,11 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			)
 		}
 
-		val rotatedNode = if (balance == Weight.RIGHT_HEAVY) rotateLeft(node)
-		else if (balance == Weight.LEFT_HEAVY) rotateRight(node) else node
+		val rotatedNode = when (balance) {
+			Weight.RIGHT_HEAVY -> rotateLeft(node)
+			Weight.LEFT_HEAVY -> rotateRight(node)
+			else -> node
+		}
 
 		return rotatedNode
 	}
