@@ -2,16 +2,15 @@ package org.treelib
 
 import kotlin.math.max
 
-
 /**
  * Represents a node in the AVL tree.
  *
  * @param K the type of keys maintained by this node.
- * @param V the type of mapped data.
+ * @param D the type of mapped data.
  * @property key the key associated with this node.
  * @property data the data stored in this node.
  */
-class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<K, V>>(key, data) {
+class AVLNode<K : Comparable<K>, D : Any>(key: K, data: D) : Node<K, D, AVLNode<K, D>>(key, data) {
 	var height: Int = 1
 		private set
 
@@ -24,11 +23,11 @@ class AVLNode<K : Comparable<K>, V : Any>(key: K, data: V) : Node<K, V, AVLNode<
  * An AVL tree that maintains balance through rotations.
  *
  * @param K the type of keys maintained by this tree.
- * @param V the type of mapped data.
+ * @param D the type of mapped data.
  * @property root the root node of the AVL tree.
  */
-class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
-	BinaryTree<K, V, AVLNode<K, V>>(root) {
+class AVLTree<K : Comparable<K>, D : Any>(root: AVLNode<K, D>? = null) :
+	BinaryTree<K, D, AVLNode<K, D>>(root) {
 
 	enum class Weight(val value: Int) {
 		BALANCED(0),
@@ -38,14 +37,14 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		RIGHT_LEFT_HEAVY(-1)
 	}
 
-	private fun rotateHelper(node: AVLNode<K, V>, child: AVLNode<K, V>){
+	private fun rotateHelper(node: AVLNode<K, D>, child: AVLNode<K, D>) {
 		node.updateHeight()
 		child.updateHeight()
 		if (root == node)
 			root = child
 	}
 
-	private fun rotateLeft(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateLeft(node: AVLNode<K, D>): AVLNode<K, D> {
 		val rightChild = node.right ?: return node
 		val middleSubtree = rightChild.left
 
@@ -56,7 +55,7 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		return rightChild
 	}
 
-	private fun rotateRight(node: AVLNode<K, V>): AVLNode<K, V> {
+	private fun rotateRight(node: AVLNode<K, D>): AVLNode<K, D> {
 		val leftChild = node.left ?: return node
 		val middleSubtree = leftChild.right
 
@@ -67,17 +66,17 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 		return leftChild
 	}
 
-	private fun balance(node: AVLNode<K, V>): AVLNode<K, V> {
-		fun Int.toWeight(): Weight{
+	private fun balance(node: AVLNode<K, D>): AVLNode<K, D> {
+		fun Int.toWeight(): Weight {
 			return Weight.entries.find { it.value == this }
 				?: throw IllegalArgumentException("Cannot find weight: $this")
 		}
 
-		fun getHeight(node: AVLNode<K, V>?): Int {
+		fun getHeight(node: AVLNode<K, D>?): Int {
 			return node?.height ?: 0
 		}
 
-		fun getBalanceFactor(node: AVLNode<K, V>?): Weight {
+		fun getBalanceFactor(node: AVLNode<K, D>?): Weight {
 			return (getHeight(node?.right) - getHeight(node?.left)).toWeight()
 		}
 
@@ -111,12 +110,11 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	 *
 	 * @param key the key to insert.
 	 * @param data the data associated with the key.
-	 * @return the inserted node, or the updated node if the key already exists.
 	 */
-	override fun insert(key: K, data: V) {
-		var insertedNode: AVLNode<K, V>?
+	override fun insert(key: K, data: D) {
+		var insertedNode: AVLNode<K, D>?
 
-		fun insertRec(node: AVLNode<K, V>?): AVLNode<K, V>? {
+		fun insertRec(node: AVLNode<K, D>?): AVLNode<K, D>? {
 			if (node == null) {
 				insertedNode = AVLNode(key, data)
 				return insertedNode
@@ -131,7 +129,6 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 			}
 			node.updateHeight()
 			return balance(node)
-
 		}
 		root = insertRec(root)
 	}
@@ -146,11 +143,10 @@ class AVLTree<K : Comparable<K>, V : Any>(root: AVLNode<K, V>? = null) :
 	 * In non-root deletion cases, the function returns the replacement node.
 	 *
 	 * @param key the key of the node to delete.
-	 * @return the new root if the deleted node was the root, or the replacement node otherwise.
 	 * @throws NoSuchElementException if a node with the specified key is not found.
 	 */
 	override fun delete(key: K) {
-		fun deleteRec(key: K, node: AVLNode<K, V>?): AVLNode<K, V>? {
+		fun deleteRec(key: K, node: AVLNode<K, D>?): AVLNode<K, D>? {
 			when {
 				node == null -> throw NoSuchElementException("Cannot find node to be deleted: key = $key")
 				key < node.key -> node.left = deleteRec(key, node.left)
