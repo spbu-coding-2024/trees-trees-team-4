@@ -9,8 +9,7 @@ package org.treelib
  * @param N the type of node used in the tree.
  */
 abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
-	var root: N? = null
-		protected set
+	internal var root: N? = null
 
 	protected fun getMinNode(start: N? = root): N? {
 		var resultNode = start ?: return null
