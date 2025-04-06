@@ -1,6 +1,7 @@
 package org.treelib
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -20,8 +21,9 @@ class BSTTest {
     @Test
     fun `insert to empty tree`(){
         val tree: BST<Int, Int> = BST()
-        val node: BSTNode<Int, Int> = tree.insert(0, 0)
-        assert(tree.root == node)
+        tree.insert(0, 0)
+        assert(tree.root?.data == 0)
+        assert(tree.root?.key == 0)
     }
     @Test
     fun `delete from empty tree`(){
@@ -31,62 +33,69 @@ class BSTTest {
     @Test
     fun `insert to single node tree (left)`(){
         val tree: BST<Int, Int> = BST(BSTNode(1, 1))
-        val node = tree.insert(0, 0)
-        assert(tree.root?.left == node)
+        tree.insert(0, 0)
+        assert(tree.root?.left?.data == 0)
+        assert(tree.root?.left?.key == 0)
     }
     @Test
     fun `insert to single node tree (right)`(){
         val tree: BST<Int, Int> = BST(BSTNode(1, 1))
-        val node = tree.insert(2, 2)
-        assert(tree.root?.right == node)
+        tree.insert(2, 2)
+        assert(tree.root?.right?.data == 2)
+        assert(tree.root?.right?.key == 2)
     }
     @Test
     fun `insert must update data`(){
         val tree: BST<Int, Int> = BST(BSTNode(1, 1))
         val node = tree.insert(1, 2)
-        assert(tree.root?.data == node.data)
+        assert(tree.root?.data == 2)
+        assert(tree.root?.key == 1)
     }
     @Test
     fun `is delete from single node tree returning required node`(){
         val node: BSTNode<Int, Int> = BSTNode(1, 1)
         val tree: BST<Int, Int> = BST(node)
-        assert(tree.delete(1) == node)
+        assert(tree.delete(1) == node.data)
     }
     @Test
     fun `is delete from single node tree actually deleting required node`(){
         val node: BSTNode<Int, Int> = BSTNode(1, 1)
         val tree: BST<Int, Int> = BST(node)
-        assert(tree.delete(1) == node)
+        assert(tree.delete(1) == node.data)
     }
     @Test
     fun `simple min (int)`(){
         val tree: BST<Int, Int> = BST(BSTNode(1, 1))
-        val node = tree.insert(0, 0)
+        tree.insert(0, 0)
         tree.insert(2, 2)
-        assert(tree.findMin() == node)
+        assert(tree.findMin()?.data == 0)
+        assert(tree.findMin()?.key == 0)
     }
 
     @Test
     fun `simple max (int)`(){
         val tree: BST<Int, Int> = BST(BSTNode(1, 1))
-        val node = tree.insert(2, 2)
+        tree.insert(2, 2)
         tree.insert(0, 0)
-        assert(tree.findMax() == node)
+        assert(tree.findMin()?.data == 0)
+        assert(tree.findMin()?.key == 0)
     }
     @Test
     fun `simple min (string)`(){
         val tree: BST<String, Int> = BST(BSTNode("bobr", 0))
-        val node = tree.insert("a", 0)
+        tree.insert("a", 0)
         tree.insert("k-wa", 2)
-        assert(tree.findMin() == node)
+        assert(tree.findMin()?.data == 0)
+        assert(tree.findMin()?.key == "a")
     }
 
     @Test
     fun `simple max (string)`(){
         val tree: BST<String, Int> = BST(BSTNode("bobr", 0))
-        val node = tree.insert("k-wa", 0)
+        tree.insert("k-wa", 0)
         tree.insert("ja", 2)
-        assert(tree.findMax() == node)
+        assert(tree.findMax()?.data == 0)
+        assert(tree.findMax()?.key == "k-wa")
     }
     @Test
     fun `a lot of desending insert and min`(){
@@ -290,6 +299,48 @@ class BSTTest {
         tree.insert(0, 0)
         tree.delete(7)
         assert(isIntTreeConsistent(tree.root))
+    }
+
+    @Test
+    fun `iterator (int)`() {
+        val tree: BST<Int, Int> = BST()
+        val keys = arrayOf(13, 26, 89 ,36 , 15)
+        val dataValues = arrayOf(0, 2 ,4 ,3, 1)
+        for (i in 0..(keys.size - 1)) {
+            tree.insert(keys[i], dataValues[i])
+        }
+        var i = 0
+        tree.iterator().forEach {
+            assertEquals(it, i)
+            i++
+        }
+    }
+
+    @Test
+    fun `iterator (string)`() {
+        val tree: BST<String, Int> = BST()
+        val keys = arrayOf("never", "argue", "with", "stupid", "people")
+        val dataValues = arrayOf(1, 0, 4, 3, 2)
+        for (i in 0..(keys.size - 1)) {
+            tree.insert(keys[i], dataValues[i])
+        }
+        var i = 0
+        tree.iterator().forEach {
+            assertEquals(it, i)
+            i++
+        }
+    }
+    @Test
+    fun `next method test`() {
+        val tree: BST<Int, Int> = BST()
+        tree.insert(7, 123)
+        tree.insert(8, 4)
+        tree.insert(6, 2)
+        tree.insert(9, 0)
+        tree.insert(2, 123)
+        tree.insert(1, 2)
+        tree.insert(4, 213)
+        tree.insert(3, 99)
     }
     private fun isIntTreeConsistent(root: BSTNode<Int, Int>?): Boolean{
         var result = false

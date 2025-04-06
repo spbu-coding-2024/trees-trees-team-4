@@ -6,7 +6,7 @@ const val BLACK = false
 /**
  * A Node of Red-Black Tree
  * @param K the key type
- * @param D the value type
+ * @param D the data value type
  * @param key a key associated with the tree
  * @param data a data value associated with the tree
  */
