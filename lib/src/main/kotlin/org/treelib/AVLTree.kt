@@ -146,13 +146,15 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 	 * @param key the key of the node to delete.
 	 * @throws NoSuchElementException if a node with the specified key is not found.
 	 */
-	override fun delete(key: K) {
+	override fun delete(key: K): D? {
+		var deletedData: D? = null
 		fun deleteRec(key: K, node: AVLNode<K, D?>?): AVLNode<K, D?>? {
 			when {
 				node == null -> throw NoSuchElementException("Cannot find node to be deleted: key = $key")
 				key < node.key -> node.left = deleteRec(key, node.left)
 				key > node.key -> node.right = deleteRec(key, node.right)
 				else -> {
+					deletedData = node.data
 					if (node.left == null || node.right == null) {
 						return node.left ?: node.right
 					}
@@ -174,5 +176,6 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 		} else root?.let {
 			deleteRec(key, it)
 		}
+		return deletedData
 	}
 }

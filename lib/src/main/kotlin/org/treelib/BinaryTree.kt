@@ -78,8 +78,9 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	 * If the node is not found, an exception is thrown.
 	 *
 	 * @param key the key of the node to delete.
+	 *
 	 */
-	abstract fun delete(key: K)
+	abstract fun delete(key: K): D?
 
 	/**
 	 * Returns an iterator over the data in the tree in in-order traversal.
