@@ -17,7 +17,7 @@ class BSTNode<K : Comparable<K>, D : Any?>(key: K, data: D?) : Node<K, D?, BSTNo
  * @param D the type of mapped values.
  * @property root the root node of the binary search tree, or null if the tree is empty.
  */
-class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData: D? = null):
+class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData: D? = null) :
     BinaryTree<K, D?, BSTNode<K, D?>>() {
 
     init {
@@ -32,7 +32,6 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
      *
      * @param key a key of a node to be inserted
      * @param data a value of a node to be inserted
-     * @return the inserted node, or the updated node if node with that key already exists.
      */
     override fun insert(key: K, data: D?) {
         val resultNode: BSTNode<K, D?> = BSTNode(key, data)
@@ -53,9 +52,10 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
      * Deletes the node with the specified [key] from the binary search tree.
      *
      * @param key the key of the node to be deleted.
-     * @return the deleted node or null, if impossible to find such node
+     * @return the data of deleted node
+     * @throws NoSuchElementException, if impossible to find node with key passed
      */
-    override fun delete(key: K) : D?{
+    override fun delete(key: K): D? {
         var result: BSTNode<K, D?>? = root
         var target: BSTNode<K, D?>? = root
         var current: BSTNode<K, D?>? = null
@@ -73,36 +73,39 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
             current = target
             target = if (target.key > key) target.left else target.right
         }
-        if (result == null){ throw NoSuchElementException("Cannot find node to be deleted") }else{ return result.data}
+        if (result == null) {
+            throw NoSuchElementException("Cannot find node to be deleted")
+        } else {
+            return result.data
+        }
     }
 
     private fun replaceWithAppending(target: BSTNode<K, D?>, required: BSTNode<K, D?>?): BSTNode<K, D?>? {
         val result: BSTNode<K, D?>? = when {
-                target.right == null -> target.left
-                target.left == null -> target.right
-                required != null -> {
-                    required.left = target.left
-                    target.right
-                }
-                else -> target.right
+            target.right == null -> target.left
+            target.left == null -> target.right
+            required != null -> {
+                required.left = target.left
+                target.right
             }
+
+            else -> target.right
+        }
         return result
     }
 
     private fun replaceByUpdating(target: BSTNode<K, D?>?, required: BSTNode<K, D?>): BSTNode<K, D?> {
-        if (target?.key == required.key){
+        if (target?.key == required.key) {
             target.data = required.data
             return target
-        }
-        else{
+        } else {
             return required
         }
     }
 
     private fun stepDeep(node: BSTNode<K, D?>, key: K): BSTNode<K, D?>? {
         val result: BSTNode<K, D?>? =
-            when
-            {
+            when {
                 node.key > key -> node.left
                 node.key < key -> node.right
                 else -> node
@@ -110,6 +113,7 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
 
         return result
     }
+
     private fun getMin(start: BSTNode<K, D?>? = root): BSTNode<K, D?>? {
         var resultNode = start ?: return null
         while (true) {
