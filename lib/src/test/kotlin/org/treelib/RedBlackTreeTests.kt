@@ -115,7 +115,7 @@ class RedBlackTreeUnitTests {
         intTree.insert(21, 3)
         intTree.insert(1, 3)
         check.printTree()
-        assertEquals(intTree.delete(1)?.data, 3)
+        assertEquals(intTree.delete(1), 3)
         check.checkAll()
     }
 

@@ -6,11 +6,11 @@ const val BLACK = false
 /**
  * A Node of Red-Black Tree
  * @param K the key type
- * @param V the value type
+ * @param D the value type
  * @param key a key associated with the tree
  * @param data a data value associated with the tree
  */
-class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>>(key, data) {
+class RBNode<K: Comparable<K>, D : Any>(key: K, data: D): Node<K, D, RBNode<K,D>>(key, data) {
     /**
      * A color of a node.
      */
@@ -19,20 +19,20 @@ class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>
 /**
  * A Red-Black tree then balances itself
  * @param K the key type
- * @param V the value type
+ * @param D the data value type
  * @property root the root of a tree
  */
-class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() {
+class RedBlackTree<K: Comparable<K>, D : Any>: BinaryTree<K, D, RBNode<K, D>>() {
 
     /**
      * The amount of node in tree.
      */
 
-    private fun isRed(node: RBNode<K, V>?): Boolean {
+    private fun isRed(node: RBNode<K, D>?): Boolean {
         return node?.color ?: BLACK
     }
 
-    private fun flipColors(node: RBNode<K, V>?) {
+    private fun flipColors(node: RBNode<K, D>?) {
         checkNotNull(node)
         node.color = !node.color
         node.left?.let {
@@ -43,7 +43,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         }
     }
 
-    private fun balanceNode(node: RBNode<K, V>): RBNode<K, V> {
+    private fun balanceNode(node: RBNode<K, D>): RBNode<K, D> {
         var current = node
 
         if (!isRed(current.left) && isRed(current.right)) {
@@ -58,7 +58,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         return current
     }
 
-    private fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
+    private fun rotateLeft(node: RBNode<K, D>): RBNode<K,D> {
         val right = node.right
         right?.let {
             node.right = it.left
@@ -71,7 +71,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         }
     }
 
-    private fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
+    private fun rotateRight(node: RBNode<K, D>): RBNode<K,D> {
         val left = node.left
         left?.let {
             node.left = left.right
@@ -93,16 +93,14 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
      *
      * @param key a key of a node to be inserted
      * @param value a value of a node to be inserted
-     * @return the inserted node
      */
-    override fun insert(key: K, value: V): RBNode<K, V> {
-        var newNode = RBNode<K,V>(key, value)
+    override fun insert(key: K, value: D) {
+        var newNode = RBNode<K,D>(key, value)
         root = insert(root, key, value, newNode)
         root?.color = BLACK
-        return newNode
     }
 
-    private fun insert(node: RBNode<K, V>?, key: K, value: V, newNode: RBNode<K, V>): RBNode<K, V> {
+    private fun insert(node: RBNode<K, D>?, key: K, value: D, newNode: RBNode<K, D>): RBNode<K, D> {
         if (node == null) {
             return newNode
         }
@@ -114,7 +112,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         return balanceNode(node)
     }
 
-    private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
+    private fun moveRedLeft(node: RBNode<K, D>): RBNode<K, D> {
         require(isRed(node) && !isRed(node.left) && !isRed(node.left?.left))
         var current = node
         flipColors(current)
@@ -128,7 +126,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         return current
     }
 
-    private fun moveRedRight(node: RBNode<K, V>): RBNode<K, V> {
+    private fun moveRedRight(node: RBNode<K, D>): RBNode<K, D> {
         require(isRed(node) && !isRed(node.right) && !isRed(node.right?.left))
         var current = node
         flipColors(current)
@@ -141,27 +139,27 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
     /**
      * Deletes the minimal element in tree
 
-     * @return the deleted node
+     * @return the deleted data value
      * @throws NoSuchElementException if there's no nodes in tree
      */
-    fun deleteMin(): RBNode<K,V> {
+    fun deleteMin(): D {
         root?.let {
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
-            var (newRoot, deletedNode) = deleteMin(it)
+            var (newRoot, deletedData) = deleteMin(it)
             root = newRoot
             if (root != null) root?.color = BLACK
-            return deletedNode
+            return deletedData
         } ?:
         throw NoSuchElementException("Nothing to delete")
     }
 
-    private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
+    private fun deleteMin(node: RBNode<K, D>): Pair<RBNode<K, D>?, D> {
         var current = node
 
          if (current.left == null) {
-            return Pair(null, node)
+            return Pair(null, node.data)
         }
         if (!isRed(current.left) && !isRed(current.left?.left)) {
             current = moveRedLeft(current)
@@ -173,9 +171,9 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         } ?: error("deleteMin: left node is null")
     }
 
-    private fun delete(node: RBNode<K, V>, key: K): Pair<RBNode<K, V>?,RBNode<K, V>?> {
+    private fun delete(node: RBNode<K, D>, key: K): Pair<RBNode<K, D>?,D?> {
         var current = node
-        var deletedNode: RBNode<K, V>? = null
+        var deletedData: D? = null
         if (key < current.key) {
             if (!isRed(current.left) && !isRed(current.left?.left)) {
                 current = moveRedLeft(current)
@@ -183,7 +181,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
             current.left?.let{
                 var returnValue = delete(it, key)
                 current.left = returnValue.first
-                deletedNode = returnValue.second
+                deletedData = returnValue.second
             }
         } else {
             if (isRed(current.left)) {
@@ -191,7 +189,7 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
             }
             if (key == current.key && current.right == null) {
                 require(isRed(current))
-                return Pair(null, node)
+                return Pair(null, node.data)
             }
             if (!isRed(current.right) && !isRed(current.right?.left)) {
                 current = moveRedRight(current)
@@ -205,30 +203,30 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
                 current.right?.let {
                     var returnValue = deleteMin(it)
                     current.right = returnValue.first
-                    deletedNode = returnValue.second
+                    deletedData = returnValue.second
                 }
             }
             else {
                 current.right?.let {
                     var returnValue = delete(it, key)
                     current.right = returnValue.first
-                    deletedNode = returnValue.second
+                    deletedData = returnValue.second
                 }
             }
         }
-        return Pair(balanceNode(current), deletedNode)
+        return Pair(balanceNode(current), deletedData)
     }
 
     /**
     * Deletes an element with the given key in tree
     *
     * @param key a key of node to be deleted
-    * @return the deleted node
-    * @throws NoSuchElementException if there's no nodes in tree
+    * @return the deleted data value
+    * @throws NoSuchElementException if there's node to be deleted or tree is empty
     */
-    override fun delete(key: K): RBNode<K, V>? {
+    override fun delete(key: K): D? {
         root?.let {
-            if (search(key) == null) return null
+            if (search(key) == null) throw NoSuchElementException("No such node to be deleted")
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
@@ -237,6 +235,6 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
             if (root != null) root?.color = BLACK
             return deletedNode
         } ?:
-        throw NoSuchElementException("Nothing to delete")
+        throw NoSuchElementException("Tree is empty")
     }
 }
