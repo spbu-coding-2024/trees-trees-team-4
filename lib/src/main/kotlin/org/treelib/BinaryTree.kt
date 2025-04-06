@@ -4,27 +4,34 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	var root: N? = null
 		protected set
 
-	fun findMin(start: N? = root): N? {
+	fun findMin(start: N? = root): D? {
 		var resultNode = start ?: return null
 		while (true) {
-			resultNode = resultNode.left ?: return resultNode
+			resultNode = resultNode.left ?: return resultNode.data
 		}
 	}
 
-	fun findMax(start: N? = root): N? {
+	fun findMax(start: N? = root): D? {
 		var resultNode = start ?: return null
+		while (true) {
+			resultNode = resultNode.right ?: return resultNode.data
+		}
+	}
+
+	protected fun findPredecessor(node: N): N?{
+		var resultNode = node.left ?: return null
 		while (true) {
 			resultNode = resultNode.right ?: return resultNode
 		}
 	}
 
-	fun search(key: K, start: N? = root): N? {
+	fun search(key: K, start: N? = root): D? {
 		var node = start
 		while (node != null) {
 			node = when {
 				key < node.key -> node.left
 				key > node.key -> node.right
-				else -> return node
+				else -> return node.data
 			}
 		}
 		return null
