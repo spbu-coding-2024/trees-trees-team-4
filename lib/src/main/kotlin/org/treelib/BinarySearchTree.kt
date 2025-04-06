@@ -50,7 +50,7 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
     }
 
     /**
-     * Deletes the node with the specified [key] from the ADL tree.
+     * Deletes the node with the specified [key] from the binary search tree.
      *
      * @param key the key of the node to be deleted.
      * @return the deleted node or null, if impossible to find such node
