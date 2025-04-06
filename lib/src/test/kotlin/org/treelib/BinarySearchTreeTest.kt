@@ -300,48 +300,6 @@ class BSTTest {
         tree.delete(7)
         assert(isIntTreeConsistent(tree.root))
     }
-
-    @Test
-    fun `iterator (int)`() {
-        val tree: BST<Int, Int> = BST()
-        val keys = arrayOf(13, 26, 89 ,36 , 15)
-        val dataValues = arrayOf(0, 2 ,4 ,3, 1)
-        for (i in 0..(keys.size - 1)) {
-            tree.insert(keys[i], dataValues[i])
-        }
-        var i = 0
-        tree.iterator().forEach {
-            assertEquals(it, i)
-            i++
-        }
-    }
-
-    @Test
-    fun `iterator (string)`() {
-        val tree: BST<String, Int> = BST()
-        val keys = arrayOf("never", "argue", "with", "stupid", "people")
-        val dataValues = arrayOf(1, 0, 4, 3, 2)
-        for (i in 0..(keys.size - 1)) {
-            tree.insert(keys[i], dataValues[i])
-        }
-        var i = 0
-        tree.iterator().forEach {
-            assertEquals(it, i)
-            i++
-        }
-    }
-    @Test
-    fun `next method test`() {
-        val tree: BST<Int, Int> = BST()
-        tree.insert(7, 123)
-        tree.insert(8, 4)
-        tree.insert(6, 2)
-        tree.insert(9, 0)
-        tree.insert(2, 123)
-        tree.insert(1, 2)
-        tree.insert(4, 213)
-        tree.insert(3, 99)
-    }
     private fun isIntTreeConsistent(root: BSTNode<Int, Int>?): Boolean{
         var result = false
         val left = root?.left

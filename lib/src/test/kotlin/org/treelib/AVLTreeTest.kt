@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,7 +20,6 @@ class AVLTreeTest {
 	fun insert_root() {
 		val tree = AVLTree<Int, String>()
 		tree.insert(1, "one")
-
 		assertNotNull(tree.root)
 		assertEquals(1, tree.root?.key)
 	}
@@ -29,27 +27,24 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Insert: single node")
 	fun insert_singleNode_returnsNewNodeAndSetsRoot() {
-		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
-		val inserted = tree.insert(10, "ten")
-
+		val tree = AVLTree(1, "one")
+		tree.insert(10, "ten")
+		val inserted = tree.search(10)
 		assertNotNull(inserted)
-		assertEquals(10, inserted?.key)
-		assertEquals("ten", inserted?.data)
-		assertSame(inserted, tree.root?.right)
+		assertEquals("ten", inserted)
+		assertEquals("ten", tree.root?.right?.data)
 	}
 
 	@Test
 	@DisplayName("Insert: right rotation")
 	fun insert_rightRotation() {
-		val tree = AVLTree<Int, String>(AVLNode(3, "three"))
+		val tree = AVLTree(3, "three")
 		tree.insert(2, "two")
-		tree.insert(1, "one")  // triggers right rotation
-
+		tree.insert(1, "one")
 		assertEquals(2, tree.root?.key)
 		assertEquals(1, tree.root?.left?.key)
 		assertEquals(3, tree.root?.right?.key)
 	}
-
 
 	@Test
 	@DisplayName("Insert: left rotation")
@@ -57,8 +52,7 @@ class AVLTreeTest {
 		val tree = AVLTree<Int, String>()
 		tree.insert(1, "one")
 		tree.insert(2, "two")
-		tree.insert(3, "three")  // triggers single left rotation
-
+		tree.insert(3, "three")
 		val root = tree.root!!
 		assertEquals(2, root.key)
 		assertEquals(1, root.left?.key)
@@ -71,8 +65,7 @@ class AVLTreeTest {
 		val tree = AVLTree<Int, String>()
 		tree.insert(3, "three")
 		tree.insert(1, "one")
-		tree.insert(2, "two")  // triggers left-right rotation
-
+		tree.insert(2, "two")
 		val root = tree.root!!
 		assertEquals(2, root.key)
 		assertEquals(1, root.left?.key)
@@ -85,8 +78,7 @@ class AVLTreeTest {
 		val tree = AVLTree<Int, String>()
 		tree.insert(1, "one")
 		tree.insert(3, "three")
-		tree.insert(2, "two")  // triggers right-left rotation
-
+		tree.insert(2, "two")
 		val root = tree.root!!
 		assertEquals(2, root.key)
 		assertEquals(1, root.left?.key)
@@ -96,35 +88,33 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: delete root")
 	fun delete_rootDelete() {
-		val tree = AVLTree<Int, String>(AVLNode(5, "five"))
-		val deleted = tree.delete(5)
-
-		assertNull(deleted)
+		val tree = AVLTree(5, "five")
+		tree.delete(5)
 		assertNull(tree.root)
 	}
 
 	@Test
 	@DisplayName("Delete: one child")
 	fun delete_oneChild() {
-		val tree = AVLTree(AVLNode(1, "one"))
+		val tree = AVLTree(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
 		tree.insert(4, "four")
-		val deleted = tree.delete(3)
-
-		assertEquals(4, deleted?.key)
+		tree.delete(3)
+		assertNull(tree.search(3))
+		val node4 = tree.search(4)
+		assertNotNull(node4)
+		assertEquals("four", node4)
 	}
 
 	@Test
 	@DisplayName("Delete: two children")
 	fun delete_nodeWithTwoChildren_replacesWithPredecessor() {
-		val tree = AVLTree<Int, String>(AVLNode(10, "ten"))
+		val tree = AVLTree(10, "ten")
 		tree.insert(5, "five")
 		tree.insert(15, "fifteen")
 		tree.insert(7, "seven")
-		val deleted = tree.delete(10)
-		assertNotNull(deleted)
-		// Predecessor of 10 is 7
+		tree.delete(10)
 		assertEquals(7, tree.root?.key)
 		assertEquals("seven", tree.root?.data)
 	}
@@ -132,8 +122,8 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Delete: nonexistent key")
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
-		val tree = AVLTree<Int, String>(AVLNode(1, "one"))
-		assertFailsWith<NoSuchElementException> {tree.delete(42)}
+		val tree = AVLTree(1, "one")
+		assertFailsWith<NoSuchElementException> { tree.delete(42) }
 		assertEquals(1, tree.root?.key)
 	}
 
@@ -142,7 +132,6 @@ class AVLTreeTest {
 	fun iterator_emptyTree() {
 		val tree = AVLTree<Int, String>()
 		val iter = tree.iterator()
-
 		assertFalse(iter.hasNext())
 		assertThrows(NoSuchElementException::class.java) { iter.next() }
 	}
@@ -152,7 +141,6 @@ class AVLTreeTest {
 	fun iterator_singleElement() {
 		val tree = AVLTree<Int, String>()
 		tree.insert(42, "forty‑two")
-
 		val iter = tree.iterator().iterator()
 		assertTrue(iter.hasNext())
 		assertEquals("forty‑two", iter.next())
@@ -165,10 +153,9 @@ class AVLTreeTest {
 	fun iterator_nextThrowsAfterExhaustion() {
 		val tree = AVLTree<Int, String>()
 		tree.insert(1, "one")
-
 		val iter = tree.iterator().iterator()
 		assertTrue(iter.hasNext())
-		iter.next()  // consume the only element
+		iter.next()
 		assertFalse(iter.hasNext())
 		assertThrows(NoSuchElementException::class.java) { iter.next() }
 	}
@@ -187,8 +174,7 @@ class AVLTreeTest {
 		tree.insert(5, "five")
 		val found = tree.search(5)
 		assertNotNull(found)
-		assertEquals(5, found?.key)
-		assertEquals("five", found?.data)
+		assertEquals("five", found)
 	}
 
 	@Test
@@ -207,11 +193,10 @@ class AVLTreeTest {
 	fun search_multipleNodes() {
 		val tree = AVLTree<Int, String>()
 		listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven").forEach { (k, v) -> tree.insert(k, v) }
-
 		for ((key, value) in listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven")) {
 			val found = tree.search(key)
 			assertNotNull(found)
-			assertEquals(value, found?.data)
+			assertEquals(value, found)
 		}
 	}
 
@@ -219,17 +204,13 @@ class AVLTreeTest {
 	@DisplayName("Search: after rotations still finds all keys")
 	fun search_afterRotations() {
 		val tree = AVLTree<Int, String>()
-		// Trigger single left rotation
 		tree.insert(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
-		// Trigger left-right rotation
 		tree.insert(5, "five")
 		tree.insert(4, "four")
-		// Trigger right-left rotation
 		tree.insert(0, "zero")
 		tree.insert(-1, "minus one")
-
 		listOf(
 			-1 to "minus one",
 			0 to "zero",
@@ -239,23 +220,26 @@ class AVLTreeTest {
 			4 to "four",
 			5 to "five"
 		).forEach { (k, v) ->
-				val found = tree.search(k)
-				assertNotNull(found, "Expected to find key $k")
-				assertEquals(v, found?.data)
-			}
+			val found = tree.search(k)
+			assertNotNull(found, "Expected to find key $k")
+			assertEquals(v, found)
+		}
 	}
 
 	class AVLTreeParameterizedTests {
-		private fun height(node: AVLNode<Int, Int>?): Int {
+		private fun height(node: AVLNode<Int, Int?>?): Int {
 			return node?.height ?: 0
 		}
 
-		private fun isBalanced(node: AVLNode<Int, Int>?): Boolean {
-			return if (node == null) true else if (abs(height(node.left) - height(node.right)) > 1) false
-			else isBalanced(node.left) && isBalanced(node.right)
+		private fun isBalanced(node: AVLNode<Int, Int?>?): Boolean {
+			return when {
+				node == null -> true
+				abs(height(node.left) - height(node.right)) > 1 -> false
+				else -> isBalanced(node.left) && isBalanced(node.right)
+			}
 		}
 
-		private fun inOrder(node: AVLNode<Int, Int>?): List<Int> {
+		private fun inOrder(node: AVLNode<Int, Int?>?): List<Int> {
 			return if (node == null) emptyList() else inOrder(node.left) + listOf(node.key) + inOrder(node.right)
 		}
 
@@ -288,9 +272,9 @@ class AVLTreeTest {
 			val tree = AVLTree<Int, Int>()
 			list.forEach { key -> tree.insert(key, key * 2) }
 			list.forEach { key ->
-				val node = tree.search(key)
-				assertNotNull(node, "Node with key $key should be found")
-				assertEquals(key * 2, node!!.data, "For key $key, expected value ${key * 2}")
+				val result = tree.search(key)
+				assertNotNull(result, "Node with key $key should be found")
+				assertEquals(key * 2, result, "For key $key, expected value ${key * 2}")
 			}
 		}
 
