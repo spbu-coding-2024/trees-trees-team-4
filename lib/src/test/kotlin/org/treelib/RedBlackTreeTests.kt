@@ -52,11 +52,6 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
         if (node == null) return 0
         return countNodes(node.left) + 1 + countNodes(node.right)
     }
-    fun sizeIsCorrect() {
-        if (countNodes(tree.root) != tree.size) {
-            error("Invariant failed: size is not correct")
-        }
-    }
 
     private fun printTree(node: RBNode<K, V>?, indent: Int) {
         node?.let {
@@ -76,7 +71,6 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     }
 
     fun checkAll() {
-        sizeIsCorrect()
         assertRedLinkAreLeaningLeft()
         isBlackBalanced()
     }
@@ -128,19 +122,6 @@ class RedBlackTreeUnitTests {
     @Test
     fun `Empty tree is indeed empty`() {
         assertEquals(intTree.root == null, true)
-    }
-
-    @Test
-    fun `Size is consistent 1`() {
-        intTree.insert(54, 1)
-        intTree.insert(23, 2)
-        intTree.insert(70, 3)
-        intTree.insert(19, 4)
-        intTree.insert(50, 5)
-        check.printTree()
-        intTree.delete(23)
-        check.printTree()
-        check.sizeIsCorrect()
     }
 
     @Test
@@ -266,7 +247,7 @@ class RedBlackTreePropertyBasedTests {
 
     @RepeatedTest(10)
     fun `Search function test`() {
-        for (i in 0..(randomTree.size - 1)) { //TODO("iterate")
+        for (i in 0..(randomKeys.size - 1)) {
             var value = randomTree.search(randomKeys[i])?.data
             assertEquals(value, i)
         }
