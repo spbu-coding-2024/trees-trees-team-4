@@ -64,9 +64,9 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
             if (target.key == key) {
                 result = target
                 when {
-                    current == null -> root = replaceWithAppending(target, getMin(target.right))
-                    current.left == target -> current.left = replaceWithAppending(target, getMin(target.right))
-                    else -> current.right = replaceWithAppending(target, getMin(target.right))
+                    current == null -> root = replaceWithAppending(target, getMinNode(target.right))
+                    current.left == target -> current.left = replaceWithAppending(target, getMinNode(target.right))
+                    else -> current.right = replaceWithAppending(target, getMinNode(target.right))
                 }
                 break
             }
@@ -112,12 +112,5 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
             }
 
         return result
-    }
-
-    private fun getMin(start: BSTNode<K, D?>? = root): BSTNode<K, D?>? {
-        var resultNode = start ?: return null
-        while (true) {
-            resultNode = resultNode.left ?: return resultNode
-        }
     }
 }
