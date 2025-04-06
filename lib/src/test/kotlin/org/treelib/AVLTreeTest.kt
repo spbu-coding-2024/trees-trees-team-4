@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -32,9 +31,8 @@ class AVLTreeTest {
 		tree.insert(10, "ten")
 		val inserted = tree.search(10)
 		assertNotNull(inserted)
-		assertEquals(10, inserted?.key)
-		assertEquals("ten", inserted?.data)
-		assertSame(inserted, tree.root?.right)
+		assertEquals("ten", inserted)
+		assertEquals("ten", tree.root?.right?.data)
 	}
 
 	@Test
@@ -106,7 +104,7 @@ class AVLTreeTest {
 		assertNull(tree.search(3))
 		val node4 = tree.search(4)
 		assertNotNull(node4)
-		assertEquals(4, node4?.key)
+		assertEquals("four", node4)
 	}
 
 	@Test
@@ -176,8 +174,7 @@ class AVLTreeTest {
 		tree.insert(5, "five")
 		val found = tree.search(5)
 		assertNotNull(found)
-		assertEquals(5, found?.key)
-		assertEquals("five", found?.data)
+		assertEquals("five", found)
 	}
 
 	@Test
@@ -199,7 +196,7 @@ class AVLTreeTest {
 		for ((key, value) in listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven")) {
 			val found = tree.search(key)
 			assertNotNull(found)
-			assertEquals(value, found?.data)
+			assertEquals(value, found)
 		}
 	}
 
@@ -225,7 +222,7 @@ class AVLTreeTest {
 		).forEach { (k, v) ->
 			val found = tree.search(k)
 			assertNotNull(found, "Expected to find key $k")
-			assertEquals(v, found?.data)
+			assertEquals(v, found)
 		}
 	}
 
@@ -275,9 +272,9 @@ class AVLTreeTest {
 			val tree = AVLTree<Int, Int>()
 			list.forEach { key -> tree.insert(key, key * 2) }
 			list.forEach { key ->
-				val node = tree.search(key)
-				assertNotNull(node, "Node with key $key should be found")
-				assertEquals(key * 2, node!!.data, "For key $key, expected value ${key * 2}")
+				val result = tree.search(key)
+				assertNotNull(result, "Node with key $key should be found")
+				assertEquals(key * 2, result, "For key $key, expected value ${key * 2}")
 			}
 		}
 
