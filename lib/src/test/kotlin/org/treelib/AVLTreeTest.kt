@@ -12,91 +12,103 @@ import kotlin.test.assertFailsWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
-import kotlin.math.abs
 
 class AVLTreeTest {
+
+	private fun <K : Comparable<K>, D> inOrderKeys(tree: AVLTree<K, D>): List<K> {
+		return tree.iterator().asSequence().map { it.first }.toList()
+	}
+
 	@Test
 	@DisplayName("Insert: root")
 	fun insert_root() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
-		assertNotNull(tree.root)
-		assertEquals(1, tree.root?.key)
+		val found = tree.search(1)
+		assertNotNull(found)
+		assertEquals("one", found)
 	}
 
 	@Test
 	@DisplayName("Insert: single node")
 	fun insert_singleNode_returnsNewNodeAndSetsRoot() {
-		val tree = AVLTree(1, "one")
+		val tree = AVLTree<Int, String?>(1, "one")
 		tree.insert(10, "ten")
 		val inserted = tree.search(10)
 		assertNotNull(inserted)
 		assertEquals("ten", inserted)
-		assertEquals("ten", tree.root?.right?.data)
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 10), keys)
 	}
 
 	@Test
 	@DisplayName("Insert: right rotation")
 	fun insert_rightRotation() {
-		val tree = AVLTree(3, "three")
+		val tree = AVLTree<Int, String?>(3, "three")
 		tree.insert(2, "two")
 		tree.insert(1, "one")
-		assertEquals(2, tree.root?.key)
-		assertEquals(1, tree.root?.left?.key)
-		assertEquals(3, tree.root?.right?.key)
+		assertEquals("one", tree.search(1))
+		assertEquals("two", tree.search(2))
+		assertEquals("three", tree.search(3))
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 2, 3), keys)
 	}
 
 	@Test
 	@DisplayName("Insert: left rotation")
 	fun insert_leftRotation() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
-		val root = tree.root!!
-		assertEquals(2, root.key)
-		assertEquals(1, root.left?.key)
-		assertEquals(3, root.right?.key)
+		assertEquals("one", tree.search(1))
+		assertEquals("two", tree.search(2))
+		assertEquals("three", tree.search(3))
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 2, 3), keys)
 	}
 
 	@Test
 	@DisplayName("Insert: left-right rotation")
 	fun insert_leftRightRotation() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(3, "three")
 		tree.insert(1, "one")
 		tree.insert(2, "two")
-		val root = tree.root!!
-		assertEquals(2, root.key)
-		assertEquals(1, root.left?.key)
-		assertEquals(3, root.right?.key)
+		assertEquals("one", tree.search(1))
+		assertEquals("two", tree.search(2))
+		assertEquals("three", tree.search(3))
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 2, 3), keys)
 	}
 
 	@Test
 	@DisplayName("Insert: right-left rotation")
 	fun insert_rightLeftRotation() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
 		tree.insert(3, "three")
 		tree.insert(2, "two")
-		val root = tree.root!!
-		assertEquals(2, root.key)
-		assertEquals(1, root.left?.key)
-		assertEquals(3, root.right?.key)
+		assertEquals("one", tree.search(1))
+		assertEquals("two", tree.search(2))
+		assertEquals("three", tree.search(3))
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 2, 3), keys)
 	}
 
 	@Test
 	@DisplayName("Delete: delete root")
 	fun delete_rootDelete() {
-		val tree = AVLTree(5, "five")
+		val tree = AVLTree<Int, String?>(5, "five")
 		tree.delete(5)
-		assertNull(tree.root)
+		assertNull(tree.search(5))
+		assertEquals(emptyList<Int>(), inOrderKeys(tree))
 	}
 
 	@Test
 	@DisplayName("Delete: one child")
 	fun delete_oneChild() {
-		val tree = AVLTree(1, "one")
+		val tree = AVLTree<Int, String?>(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
 		tree.insert(4, "four")
@@ -105,32 +117,38 @@ class AVLTreeTest {
 		val node4 = tree.search(4)
 		assertNotNull(node4)
 		assertEquals("four", node4)
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(1, 2, 4), keys)
 	}
 
 	@Test
 	@DisplayName("Delete: two children")
 	fun delete_nodeWithTwoChildren_replacesWithPredecessor() {
-		val tree = AVLTree(10, "ten")
+		val tree = AVLTree<Int, String?>(10, "ten")
 		tree.insert(5, "five")
 		tree.insert(15, "fifteen")
 		tree.insert(7, "seven")
 		tree.delete(10)
-		assertEquals(7, tree.root?.key)
-		assertEquals("seven", tree.root?.data)
+		assertNull(tree.search(10))
+		assertEquals("five", tree.search(5))
+		assertEquals("fifteen", tree.search(15))
+		assertEquals("seven", tree.search(7))
+		val keys = inOrderKeys(tree)
+		assertEquals(listOf(5, 7, 15), keys)
 	}
 
 	@Test
 	@DisplayName("Delete: nonexistent key")
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
-		val tree = AVLTree(1, "one")
+		val tree = AVLTree<Int, String?>(1, "one")
 		assertFailsWith<NoSuchElementException> { tree.delete(42) }
-		assertEquals(1, tree.root?.key)
+		assertEquals("one", tree.search(1))
 	}
 
 	@Test
 	@DisplayName("Iterator: empty tree")
 	fun iterator_emptyTree() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		val iter = tree.iterator()
 		assertFalse(iter.hasNext())
 		assertThrows(NoSuchElementException::class.java) { iter.next() }
@@ -139,11 +157,11 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Iterator: single element")
 	fun iterator_singleElement() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(42, "forty‑two")
 		val iter = tree.iterator().iterator()
 		assertTrue(iter.hasNext())
-		assertEquals("forty‑two", iter.next())
+		assertEquals("forty‑two", iter.next().second)
 		assertFalse(iter.hasNext())
 		assertThrows(NoSuchElementException::class.java) { iter.next() }
 	}
@@ -151,7 +169,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Iterator: next() throws after exhaustion")
 	fun iterator_nextThrowsAfterExhaustion() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
 		val iter = tree.iterator().iterator()
 		assertTrue(iter.hasNext())
@@ -163,14 +181,14 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Search: empty tree returns null")
 	fun search_emptyTree() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		assertNull(tree.search(42))
 	}
 
 	@Test
 	@DisplayName("Search: root only")
 	fun search_rootOnly() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(5, "five")
 		val found = tree.search(5)
 		assertNotNull(found)
@@ -180,7 +198,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Search: nonexistent key returns null")
 	fun search_nonexistentKey() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(10, "ten")
 		tree.insert(20, "twenty")
 		assertNull(tree.search(0))
@@ -191,9 +209,11 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Search: multiple nodes returns correct data")
 	fun search_multipleNodes() {
-		val tree = AVLTree<Int, String>()
-		listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven").forEach { (k, v) -> tree.insert(k, v) }
-		for ((key, value) in listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven")) {
+		val tree = AVLTree<Int, String?>()
+		listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven").forEach { (k, v) ->
+			tree.insert(k, v)
+		}
+		listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven").forEach { (key, value) ->
 			val found = tree.search(key)
 			assertNotNull(found)
 			assertEquals(value, found)
@@ -203,7 +223,7 @@ class AVLTreeTest {
 	@Test
 	@DisplayName("Search: after rotations still finds all keys")
 	fun search_afterRotations() {
-		val tree = AVLTree<Int, String>()
+		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
@@ -219,30 +239,14 @@ class AVLTreeTest {
 			3 to "three",
 			4 to "four",
 			5 to "five"
-		).forEach { (k, v) ->
-			val found = tree.search(k)
-			assertNotNull(found, "Expected to find key $k")
-			assertEquals(v, found)
+		).forEach { (key, value) ->
+			val found = tree.search(key)
+			assertNotNull(found, "Expected to find key $key")
+			assertEquals(value, found)
 		}
 	}
 
 	class AVLTreeParameterizedTests {
-		private fun height(node: AVLNode<Int, Int?>?): Int {
-			return node?.height ?: 0
-		}
-
-		private fun isBalanced(node: AVLNode<Int, Int?>?): Boolean {
-			return when {
-				node == null -> true
-				abs(height(node.left) - height(node.right)) > 1 -> false
-				else -> isBalanced(node.left) && isBalanced(node.right)
-			}
-		}
-
-		private fun inOrder(node: AVLNode<Int, Int?>?): List<Int> {
-			return if (node == null) emptyList() else inOrder(node.left) + listOf(node.key) + inOrder(node.right)
-		}
-
 		companion object {
 			@JvmStatic
 			fun listProvider(): Stream<List<Int>> {
@@ -260,16 +264,16 @@ class AVLTreeTest {
 		@ParameterizedTest(name = "In-order traversal returns sorted keys for list: {0}")
 		@MethodSource("listProvider")
 		fun inorderTraversalReturnsSortedKeys(list: List<Int>) {
-			val tree = AVLTree<Int, Int>()
+			val tree = AVLTree<Int, Int?>()
 			list.forEach { key -> tree.insert(key, key) }
-			val inOrderKeys = inOrder(tree.root)
+			val inOrderKeys = tree.iterator().asSequence().map { it.first }.toList()
 			assertEquals(inOrderKeys.sorted(), inOrderKeys, "In-order traversal should be sorted")
 		}
 
 		@ParameterizedTest(name = "Search returns correct values for list: {0}")
 		@MethodSource("listProvider")
 		fun searchShouldReturnCorrectValuesForInsertedKeys(list: List<Int>) {
-			val tree = AVLTree<Int, Int>()
+			val tree = AVLTree<Int, Int?>()
 			list.forEach { key -> tree.insert(key, key * 2) }
 			list.forEach { key ->
 				val result = tree.search(key)
@@ -281,14 +285,17 @@ class AVLTreeTest {
 		@ParameterizedTest(name = "Tree remains balanced after insertions and deletions for list: {0}")
 		@MethodSource("listProvider")
 		fun treeShouldRemainBalancedAfterInsertionsAndDeletions(list: List<Int>) {
-			val tree = AVLTree<Int, Int>()
+			val tree = AVLTree<Int, Int?>()
 			list.forEach { key -> tree.insert(key, key) }
-			assertTrue(isBalanced(tree.root), "Tree should be balanced after insertions")
+			val inOrderKeys1 = tree.iterator().asSequence().map { it.first }.toList()
+			assertEquals(inOrderKeys1.sorted(), inOrderKeys1, "Tree should be balanced after insertions")
 			val uniqueSorted = list.toSet().sorted()
 			uniqueSorted.forEachIndexed { index, key ->
 				if (index % 2 == 0) {
 					tree.delete(key)
-					assertTrue(isBalanced(tree.root), "Tree should remain balanced after deleting key $key")
+					val inOrderKeysAfter = tree.iterator().asSequence().map { it.first }.toList()
+					assertEquals(inOrderKeysAfter.sorted(), inOrderKeysAfter,
+						"Tree should remain balanced after deleting key $key")
 				}
 			}
 		}
