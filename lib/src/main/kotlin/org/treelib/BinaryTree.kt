@@ -95,22 +95,4 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 			inorder(node.right)
 		}
 	}
-
-	/**
-	 * Returns the next data from the iterator.
-	 *
-	 * @return the next data, or null if there are no more elements.
-	 */
-	fun next(): D? {
-		return iterator().next()
-	}
-
-	/**
-	 * Checks if there are more data available in the iterator.
-	 *
-	 * @return true if there is at least one more element, false otherwise.
-	 */
-	fun hasNext(): Boolean {
-		return iterator().hasNext()
-	}
 }
