@@ -9,8 +9,7 @@ package org.treelib
  * @param N the type of node used in the tree.
  */
 abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
-	var root: N? = null
-		protected set
+	protected var root: N? = null
 
 	/**
 	 * Returns the minimum data in the tree starting from the specified node.
@@ -87,33 +86,15 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	 *
 	 * @return an iterator over the tree's data.
 	 */
-	operator fun iterator(): Iterator<D?> = iterator {
+	operator fun iterator(): Iterator<Pair<K, D?>> = iterator {
 		inorder(root)
 	}
 
-	private suspend fun SequenceScope<D?>.inorder(node: Node<K, D?, N>?) {
+	private suspend fun SequenceScope<Pair<K, D?>>.inorder(node: Node<K, D?, N>?) {
 		if (node != null) {
 			inorder(node.left)
-			yield(node.data)
+			yield(Pair(node.key, node.data))
 			inorder(node.right)
 		}
-	}
-
-	/**
-	 * Returns the next data from the iterator.
-	 *
-	 * @return the next data, or null if there are no more elements.
-	 */
-	fun next(): D? {
-		return iterator().next()
-	}
-
-	/**
-	 * Checks if there are more data available in the iterator.
-	 *
-	 * @return true if there is at least one more element, false otherwise.
-	 */
-	fun hasNext(): Boolean {
-		return iterator().hasNext()
 	}
 }
