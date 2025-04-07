@@ -10,7 +10,18 @@ package org.treelib
  */
 abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	protected var root: N? = null
-
+	protected fun getMinNode(start: N? = root): N? {
+		var resultNode = start ?: return null
+		while (true) {
+			resultNode = resultNode.left ?: return resultNode
+		}
+	}
+	protected fun getMaxNode(start: N? = root): N? {
+		var resultNode = start ?: return null
+		while (true) {
+			resultNode = resultNode.right ?: return resultNode
+		}
+	}
 	/**
 	 * Returns the minimum data in the tree starting from the specified node.
 	 *
@@ -18,10 +29,7 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	 * @return the minimum data value, or null if the tree is empty.
 	 */
 	fun findMin(start: N? = root): D? {
-		var resultNode = start ?: return null
-		while (true) {
-			resultNode = resultNode.left ?: return resultNode.data
-		}
+		return getMinNode(start)?.data
 	}
 
 	/**
@@ -31,17 +39,7 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	 * @return the maximum data value, or null if the tree is empty.
 	 */
 	fun findMax(start: N? = root): D? {
-		var resultNode = start ?: return null
-		while (true) {
-			resultNode = resultNode.right ?: return resultNode.data
-		}
-	}
-
-	protected fun findPredecessor(node: N): N? {
-		var resultNode = node.left ?: return null
-		while (true) {
-			resultNode = resultNode.right ?: return resultNode
-		}
+		return getMaxNode(start)?.data
 	}
 
 	/**
