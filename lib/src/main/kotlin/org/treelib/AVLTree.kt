@@ -158,7 +158,7 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 					if (node.left == null || node.right == null) {
 						return node.left ?: node.right
 					}
-					val predecessor = findPredecessor(node)
+					val predecessor = getMaxNode(node.left)
 					node.key = predecessor?.key
 						?: throw NoSuchElementException(
 							"Cannot find the predecessor of the node to be deleted: key = $key"
