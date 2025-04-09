@@ -111,7 +111,7 @@ class BinarySearchTreeTest {
     @Test
     fun `a lot of desending insert and min`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(9, 0)
-        for (i in 8..0) {
+        for (i in 8 downTo 0) {
             tree.insert(i, i)
         }
         var node: BSTNode<Int, Int?>? = tree.root
@@ -123,7 +123,7 @@ class BinarySearchTreeTest {
 
     @Test
     fun `balanced inserting`() {
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5,0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)

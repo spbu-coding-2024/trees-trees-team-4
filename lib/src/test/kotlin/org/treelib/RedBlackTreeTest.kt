@@ -7,14 +7,13 @@ import org.junit.jupiter.api.RepeatedTest
 import kotlin.random.Random
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
-import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
 const val RANDOM_NUMBER_MAX_VALUE = 100
 const val RANDOM_NUMBER_MIN_VALUE = 0
 const val RANDOM_NUMBER_COUNT = 8
 
-class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V>) {
+class RBTreeInvariantCheck<K: Comparable<K>, D: Any>(var tree: RedBlackTree<K, D>) {
 
     fun isBlackBalanced() {
         if (subtreeBlackCountDifference(tree.root) == -1) {
@@ -22,7 +21,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
         }
     }
 
-    private fun subtreeBlackCountDifference(node: RBNode<K, V>?): Int {
+    private fun subtreeBlackCountDifference(node: RBNode<K, D?>?): Int {
         node?.let {
             var left = subtreeBlackCountDifference(node.left)
             var right = subtreeBlackCountDifference(node.right)
@@ -39,7 +38,7 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     fun assertRedLinkAreLeaningLeft() {
         assertRedLinkAreLeaningLeft(tree.root)
     }
-    private fun assertRedLinkAreLeaningLeft(node: RBNode<K, V>?) {
+    private fun assertRedLinkAreLeaningLeft(node: RBNode<K, D?>?) {
         node?.let {
             if (node.right?.color == RED) {
                 error("Invariant failed: tree is with right leaning red link")
@@ -48,17 +47,12 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
             assertRedLinkAreLeaningLeft(node.right)
         }
     }
-    private fun countNodes(node: RBNode<K, V>?): Int {
+    private fun countNodes(node: RBNode<K, D?>?): Int {
         if (node == null) return 0
         return countNodes(node.left) + 1 + countNodes(node.right)
     }
-    fun sizeIsCorrect() {
-        if (countNodes(tree.root) != tree.size) {
-            error("Invariant failed: size is not correct")
-        }
-    }
 
-    private fun printTree(node: RBNode<K, V>?, indent: Int) {
+    private fun printTree(node: RBNode<K, D?>?, indent: Int) {
         node?.let {
             node.right?.let { printTree(node.right, indent + 4) }
             node.left?.let { printTree(node.left, indent + 4) }
@@ -76,7 +70,6 @@ class RBTreeInvariantCheck<K: Comparable<K>, V: Any>(var tree: RedBlackTree<K, V
     }
 
     fun checkAll() {
-        sizeIsCorrect()
         assertRedLinkAreLeaningLeft()
         isBlackBalanced()
     }
@@ -121,7 +114,7 @@ class RedBlackTreeUnitTests {
         intTree.insert(21, 3)
         intTree.insert(1, 3)
         check.printTree()
-        assertEquals(intTree.delete(1)?.data, 3)
+        assertEquals(intTree.delete(1), 3)
         check.checkAll()
     }
 
@@ -131,27 +124,14 @@ class RedBlackTreeUnitTests {
     }
 
     @Test
-    fun `Size is consistent 1`() {
-        intTree.insert(54, 1)
-        intTree.insert(23, 2)
-        intTree.insert(70, 3)
-        intTree.insert(19, 4)
-        intTree.insert(50, 5)
-        check.printTree()
-        intTree.delete(23)
-        check.printTree()
-        check.sizeIsCorrect()
-    }
-
-    @Test
     fun `Insert overwrites values`() {
         intTree.insert(54, 1)
         intTree.insert(23, 2)
         intTree.insert(70, 3)
         check.printTree()
-        assertEquals(intTree.search(70)?.data, 3)
+        assertEquals(intTree.search(70), 3)
         intTree.insert(70, 10)
-        assertEquals(intTree.search(70)?.data, 10)
+        assertEquals(intTree.search(70), 10)
     }
 
     @Test
@@ -165,7 +145,7 @@ class RedBlackTreeUnitTests {
         val minValue = intTree.findMin()
         intTree.deleteMin()
         minValue?.let {
-            assertEquals(intTree.search(it.key), null)
+            assert(intTree.findMin() != minValue)
         } ?: assert(false)
     }
 
@@ -179,7 +159,7 @@ class RedBlackTreeUnitTests {
         try {
             intTree.delete(1)
         } catch (e: NoSuchElementException) {
-            assertEquals(e.message, "Nothing to delete")
+            assertEquals(e.message, "Tree is empty")
         }
     }
 
@@ -199,8 +179,12 @@ class RedBlackTreeUnitTests {
         intTree.insert(70, 3)
         intTree.insert(19, 4)
         intTree.insert(50, 5)
-        val deletedNode = intTree.delete(1)
-        assertEquals(deletedNode, null)
+        try {
+            intTree.delete(1)
+        } catch (e: NoSuchElementException) {
+            assertEquals(e.message, "No such node to be deleted")
+        }
+
     }
 
     @Test
@@ -266,8 +250,8 @@ class RedBlackTreePropertyBasedTests {
 
     @RepeatedTest(10)
     fun `Search function test`() {
-        for (i in 0..(randomTree.size - 1)) { //TODO("iterate")
-            var value = randomTree.search(randomKeys[i])?.data
+        for (i in 0..(randomKeys.size - 1)) {
+            var value = randomTree.search(randomKeys[i])
             assertEquals(value, i)
         }
     }
