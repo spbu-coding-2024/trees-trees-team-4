@@ -80,6 +80,34 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
         }
     }
 
+    /**
+     * Recursively goes around the whole tree and checks binary search tree invariant
+     *
+     * @param root the node of subtree to be checked.
+     * @return result of checking invariant - true or false
+     */
+    fun isConsistent(root: BSTNode<K, D?>? = this.root): Boolean{
+        var result = false
+        val left: BSTNode<K, D?>? = root?.left
+        val right : BSTNode<K, D?>? = root?.right
+        if (root == null)
+            result = true
+        else if (left == null && right == null) {
+            result = true
+        }
+        else if (right != null && left != null) {
+            result = left.key < root.key && root.key < right.key
+                    && isConsistent(right) && isConsistent(left)
+        }
+        else if (right != null) {
+            result = root.key < right.key && isConsistent(right)
+        }
+        else if (left != null) {
+            result = root.key > left.key && isConsistent(left)
+        }
+        return result
+    }
+
     private fun replaceWithAppending(target: BSTNode<K, D?>, required: BSTNode<K, D?>?): BSTNode<K, D?>? {
         val result: BSTNode<K, D?>? = when {
             target.right == null -> target.left

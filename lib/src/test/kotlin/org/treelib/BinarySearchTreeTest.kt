@@ -8,107 +8,122 @@ import kotlin.test.assertNull
 class BinarySearchTreeTest {
 
     @Test
-    fun `min of empty tree`(){
+    fun `min of empty tree`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree()
         assert(tree.findMin() == null)
     }
+
     @Test
-    fun `max of empty tree`(){
+    fun `max of empty tree`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree()
         assert(tree.findMax() == null)
     }
+
     @Test
-    fun `insert to empty tree`(){
+    fun `insert to empty tree`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree()
-        val node: BSTNode<Int, Int> = tree.insert(0, 0)
-        assert(tree.root == node)
+        tree.insert(0, 0)
+        assert(tree.search(0) == 0)
+        assert(tree.search(0) == 0)
+        assert(tree.isConsistent())
     }
+
     @Test
-    fun `delete from empty tree`(){
+    fun `delete from empty tree`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree()
-        assert(tree.delete(0) == null)
+        try {
+            tree.delete(0)
+        } catch (e: NoSuchElementException) {
+            assertEquals(e.message, "Cannot find node to be deleted")
+        }
     }
+
     @Test
-    fun `insert to single node tree (left)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(1, 1))
-        val node = tree.insert(0, 0)
-        assert(tree.root?.left == node)
+    fun `insert to single node tree (left)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        tree.insert(0, 0)
+        assert(tree.search(0) == 0)
+        assert(tree.isConsistent())
     }
+
     @Test
-    fun `insert to single node tree (right)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(1, 1))
-        val node = tree.insert(2, 2)
-        assert(tree.root?.right == node)
-    }
-    @Test
-    fun `insert must update data`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(1, 1))
-        val node = tree.insert(1, 2)
-        assert(tree.root?.data == node.data)
-    }
-    @Test
-    fun `is delete from single node tree returning required node`(){
-        val node: BSTNode<Int, Int> = BSTNode(1, 1)
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(node)
-        assert(tree.delete(1) == node)
-    }
-    @Test
-    fun `is delete from single node tree actually deleting required node`(){
-        val node: BSTNode<Int, Int> = BSTNode(1, 1)
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(node)
-        assert(tree.delete(1) == node)
-    }
-    @Test
-    fun `simple min (int)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(1, 1))
-        val node = tree.insert(0, 0)
+    fun `insert to single node tree (right)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
         tree.insert(2, 2)
-        assert(tree.findMin() == node)
+        assert(tree.search(2) == 2)
+        assert(tree.isConsistent())
     }
 
     @Test
-    fun `simple max (int)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(1, 1))
-        val node = tree.insert(2, 2)
-        tree.insert(0, 0)
-        assert(tree.findMax() == node)
+    fun `insert must update data`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        tree.insert(1, 2)
+        assert(tree.root?.data == 2)
+        assert(tree.root?.key == 1)
     }
+
     @Test
-    fun `simple min (string)`(){
-        val tree: BinarySearchTree<String, Int> = BinarySearchTree(BSTNode("bobr", 0))
-        val node = tree.insert("a", 0)
+    fun `is delete from single node tree returning required node`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        val node = tree.root
+        assert(tree.delete(1) == node?.data)
+    }
+
+    @Test
+    fun `is delete from single node tree actually deleting required node`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        val node = tree.root
+        assert(tree.delete(1) == node?.data)
+    }
+
+    @Test
+    fun `simple min (int)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        tree.insert(0, 0)
+        tree.insert(2, 2)
+        assert(tree.findMin() == 0)
+    }
+
+    @Test
+    fun `simple max (int)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
+        tree.insert(2, 2)
+        tree.insert(0, 0)
+        assert(tree.findMax() == 2)
+    }
+
+    @Test
+    fun `simple min (string)`() {
+        val tree: BinarySearchTree<String, Int> = BinarySearchTree("bobr", 0)
+        tree.insert("a", 0)
         tree.insert("k-wa", 2)
-        assert(tree.findMin() == node)
+        assert(tree.findMin() == 0)
     }
 
     @Test
-    fun `simple max (string)`(){
-        val tree: BinarySearchTree<String, Int> = BinarySearchTree(BSTNode("bobr", 0))
-        val node = tree.insert("k-wa", 0)
+    fun `simple max (string)`() {
+        val tree: BinarySearchTree<String, Int> = BinarySearchTree("bobr", 1)
+        tree.insert("k-wa", 0)
         tree.insert("ja", 2)
-        assert(tree.findMax() == node)
+        assert(tree.findMax() == 0)
     }
+
     @Test
-    fun `a lot of desending insert and min`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(9, 0))
-        tree.insert(8, 0)
-        tree.insert(7, 0)
-        tree.insert(6, 0)
-        tree.insert(5, 0)
-        tree.insert(4, 0)
-        tree.insert(3, 0)
-        tree.insert(2, 0)
-        tree.insert(1, 0)
-        tree.insert(0, 0)
-        var node: BSTNode<Int, Int>? = tree.root
+    fun `a lot of desending insert and min`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(9, 0)
+        for (i in 8..0) {
+            tree.insert(i, i)
+        }
+        var node: BSTNode<Int, Int?>? = tree.root
         for (i in 9 downTo 0) {
             assertEquals(i, node?.key)
             node = node?.left
         }
     }
+
     @Test
-    fun `balanced inserting`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `balanced inserting`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -129,9 +144,10 @@ class BinarySearchTreeTest {
         assertEquals(3, tree.root?.left?.right?.left?.key)
         assertEquals(0, tree.root?.left?.left?.left?.key)
     }
+
     @Test
-    fun `balanced inserting and replace root`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `balanced inserting and replace root`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -154,9 +170,10 @@ class BinarySearchTreeTest {
         assertEquals(3, tree.root?.left?.right?.left?.key)
         assertEquals(0, tree.root?.left?.left?.left?.key)
     }
+
     @Test
-    fun `balanced inserting and replace mid (left)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `balanced inserting and replace mid (left)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -179,9 +196,10 @@ class BinarySearchTreeTest {
         assertEquals(3, tree.root?.left?.right?.left?.key)
         assertEquals(0, tree.root?.left?.left?.left?.key)
     }
+
     @Test
-    fun `balanced inserting and replace mid (right)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `balanced inserting and replace mid (right)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -204,9 +222,10 @@ class BinarySearchTreeTest {
         assertEquals(3, tree.root?.left?.right?.left?.key)
         assertEquals(0, tree.root?.left?.left?.left?.key)
     }
+
     @Test
-    fun `complex delete root`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `complex delete root`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -228,9 +247,10 @@ class BinarySearchTreeTest {
         assertNotNull(tree.search(1))
         assertNotNull(tree.search(0))
     }
+
     @Test
-    fun `complex delete mid(left)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `complex delete mid(left)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -252,9 +272,10 @@ class BinarySearchTreeTest {
         assertNotNull(tree.search(1))
         assertNotNull(tree.search(0))
     }
+
     @Test
-    fun `complex delete mid(right)`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `complex delete mid(right)`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -276,9 +297,10 @@ class BinarySearchTreeTest {
         assertNotNull(tree.search(1))
         assertNotNull(tree.search(0))
     }
+
     @Test
-    fun `tree structure after delete`(){
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(BSTNode(5, 0))
+    fun `tree structure after delete`() {
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 0)
         tree.insert(7, 0)
         tree.insert(8, 0)
         tree.insert(6, 0)
@@ -289,27 +311,6 @@ class BinarySearchTreeTest {
         tree.insert(3, 0)
         tree.insert(0, 0)
         tree.delete(7)
-        assert(isIntTreeConsistent(tree.root))
-    }
-    private fun isIntTreeConsistent(root: BSTNode<Int, Int>?): Boolean{
-        var result = false
-        val left = root?.left
-        val right = root?.right
-        if (root == null)
-            result = true
-        else if (left == null && right == null) {
-            result = true
-        }
-        else if (right != null && left != null) {
-            result = left.key < root.key && root.key < right.key
-                    && isIntTreeConsistent(right) && isIntTreeConsistent(left)
-        }
-        else if (right != null) {
-            result = root.key < right.key && isIntTreeConsistent(right)
-        }
-        else if (left != null) {
-            result = root.key > left.key && isIntTreeConsistent(left)
-        }
-        return result
+        assert(tree.isConsistent())
     }
 }
