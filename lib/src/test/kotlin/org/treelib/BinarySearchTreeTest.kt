@@ -58,22 +58,20 @@ class BinarySearchTreeTest {
     fun `insert must update data`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
         tree.insert(1, 2)
-        assert(tree.root?.data == 2)
-        assert(tree.root?.key == 1)
+        assert(tree.search(1) == 2)
     }
 
     @Test
     fun `is delete from single node tree returning required node`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
-        val node = tree.root
-        assert(tree.delete(1) == node?.data)
+        assert(tree.delete(1) == 1)
     }
 
     @Test
     fun `is delete from single node tree actually deleting required node`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
-        val node = tree.root
-        assert(tree.delete(1) == node?.data)
+        tree.delete(1)
+        assert(tree.search(1) == null)
     }
 
     @Test
