@@ -239,4 +239,40 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
         } ?:
         throw NoSuchElementException("Tree is empty")
     }
+
+    private fun isBlackBalanced() {
+        if (subtreeBlackCountDifference(root) == -1) {
+            error("Invariant failed: tree is not perfect black balanced")
+        }
+    }
+
+    private fun subtreeBlackCountDifference(node: RBNode<K, D?>?): Int {
+        node?.let {
+            var left = subtreeBlackCountDifference(node.left)
+            var right = subtreeBlackCountDifference(node.right)
+            return if (left == right) {
+                left
+            } else {
+                -1
+            }
+
+        } ?:let {
+            return 1
+        }
+    }
+
+    private fun assertRedLinkAreLeaningLeft(node: RBNode<K, D?>?) {
+        node?.let {
+            if (node.right?.color == RED) {
+                error("Invariant failed: tree is with right leaning red link")
+            }
+            assertRedLinkAreLeaningLeft(node.left)
+            assertRedLinkAreLeaningLeft(node.right)
+        }
+    }
+
+    internal fun checkAll() {
+        assertRedLinkAreLeaningLeft(root)
+        isBlackBalanced()
+    }
 }
