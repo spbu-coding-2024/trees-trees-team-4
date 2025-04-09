@@ -38,7 +38,7 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
         var currentNode: BSTNode<K, D?>? = root
         while (currentNode != null && currentNode.key != key) {
             parent = currentNode
-            currentNode = stepDeep(currentNode, key)
+            currentNode = chooseSuccessor(currentNode, key)
         }
         when {
             parent == null -> root = replaceByUpdating(root, resultNode)
@@ -125,7 +125,7 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
         }
     }
 
-    private fun stepDeep(node: BSTNode<K, D?>, key: K): BSTNode<K, D?>? {
+    private fun chooseSuccessor(node: BSTNode<K, D?>, key: K): BSTNode<K, D?>? {
         val result: BSTNode<K, D?>? = when {
             node.key > key -> node.left
             node.key < key -> node.right
