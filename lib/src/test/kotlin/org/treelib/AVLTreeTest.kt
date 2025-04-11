@@ -24,7 +24,7 @@ class AVLTreeTest {
 	fun insert_root() {
 		val tree = AVLTree<Int, String?>()
 		tree.insert(1, "one")
-		val found = tree.search(1)
+		val found = tree.search(1)?.second
 		assertNotNull(found)
 		assertEquals("one", found)
 	}
@@ -34,7 +34,7 @@ class AVLTreeTest {
 	fun insert_singleNode_returnsNewNodeAndSetsRoot() {
 		val tree = AVLTree<Int, String?>(1, "one")
 		tree.insert(10, "ten")
-		val inserted = tree.search(10)
+		val inserted = tree.search(10)?.second
 		assertNotNull(inserted)
 		assertEquals("ten", inserted)
 		val keys = inOrderKeys(tree)
@@ -47,9 +47,9 @@ class AVLTreeTest {
 		val tree = AVLTree<Int, String?>(3, "three")
 		tree.insert(2, "two")
 		tree.insert(1, "one")
-		assertEquals("one", tree.search(1))
-		assertEquals("two", tree.search(2))
-		assertEquals("three", tree.search(3))
+		assertEquals("one", tree.search(1)?.second)
+		assertEquals("two", tree.search(2)?.second)
+		assertEquals("three", tree.search(3)?.second)
 		val keys = inOrderKeys(tree)
 		assertEquals(listOf(1, 2, 3), keys)
 	}
@@ -61,9 +61,9 @@ class AVLTreeTest {
 		tree.insert(1, "one")
 		tree.insert(2, "two")
 		tree.insert(3, "three")
-		assertEquals("one", tree.search(1))
-		assertEquals("two", tree.search(2))
-		assertEquals("three", tree.search(3))
+		assertEquals("one", tree.search(1)?.second)
+		assertEquals("two", tree.search(2)?.second)
+		assertEquals("three", tree.search(3)?.second)
 		val keys = inOrderKeys(tree)
 		assertEquals(listOf(1, 2, 3), keys)
 	}
@@ -75,9 +75,9 @@ class AVLTreeTest {
 		tree.insert(3, "three")
 		tree.insert(1, "one")
 		tree.insert(2, "two")
-		assertEquals("one", tree.search(1))
-		assertEquals("two", tree.search(2))
-		assertEquals("three", tree.search(3))
+		assertEquals("one", tree.search(1)?.second)
+		assertEquals("two", tree.search(2)?.second)
+		assertEquals("three", tree.search(3)?.second)
 		val keys = inOrderKeys(tree)
 		assertEquals(listOf(1, 2, 3), keys)
 	}
@@ -89,9 +89,9 @@ class AVLTreeTest {
 		tree.insert(1, "one")
 		tree.insert(3, "three")
 		tree.insert(2, "two")
-		assertEquals("one", tree.search(1))
-		assertEquals("two", tree.search(2))
-		assertEquals("three", tree.search(3))
+		assertEquals("one", tree.search(1)?.second)
+		assertEquals("two", tree.search(2)?.second)
+		assertEquals("three", tree.search(3)?.second)
 		val keys = inOrderKeys(tree)
 		assertEquals(listOf(1, 2, 3), keys)
 	}
@@ -114,7 +114,7 @@ class AVLTreeTest {
 		tree.insert(4, "four")
 		tree.delete(3)
 		assertNull(tree.search(3))
-		val node4 = tree.search(4)
+		val node4 = tree.search(4)?.second
 		assertNotNull(node4)
 		assertEquals("four", node4)
 		val keys = inOrderKeys(tree)
@@ -130,9 +130,9 @@ class AVLTreeTest {
 		tree.insert(7, "seven")
 		tree.delete(10)
 		assertNull(tree.search(10))
-		assertEquals("five", tree.search(5))
-		assertEquals("fifteen", tree.search(15))
-		assertEquals("seven", tree.search(7))
+		assertEquals("five", tree.search(5)?.second)
+		assertEquals("fifteen", tree.search(15)?.second)
+		assertEquals("seven", tree.search(7)?.second)
 		val keys = inOrderKeys(tree)
 		assertEquals(listOf(5, 7, 15), keys)
 	}
@@ -142,7 +142,7 @@ class AVLTreeTest {
 	fun delete_nonexistentKey_returnsNullAndLeavesTreeUnchanged() {
 		val tree = AVLTree<Int, String?>(1, "one")
 		assertFailsWith<NoSuchElementException> { tree.delete(42) }
-		assertEquals("one", tree.search(1))
+		assertEquals("one", tree.search(1)?.second)
 	}
 
 	@Test
@@ -192,7 +192,7 @@ class AVLTreeTest {
 		tree.insert(5, "five")
 		val found = tree.search(5)
 		assertNotNull(found)
-		assertEquals("five", found)
+		assertEquals("five", found?.second)
 	}
 
 	@Test
@@ -216,7 +216,7 @@ class AVLTreeTest {
 		listOf(10 to "ten", 5 to "five", 15 to "fifteen", 7 to "seven").forEach { (key, value) ->
 			val found = tree.search(key)
 			assertNotNull(found)
-			assertEquals(value, found)
+			assertEquals(value, found?.second)
 		}
 	}
 
@@ -242,7 +242,7 @@ class AVLTreeTest {
 		).forEach { (key, value) ->
 			val found = tree.search(key)
 			assertNotNull(found, "Expected to find key $key")
-			assertEquals(value, found)
+			assertEquals(value, found?.second)
 		}
 	}
 
@@ -276,7 +276,7 @@ class AVLTreeTest {
 			val tree = AVLTree<Int, Int?>()
 			list.forEach { key -> tree.insert(key, key * 2) }
 			list.forEach { key ->
-				val result = tree.search(key)
+				val result = tree.search(key)?.second
 				assertNotNull(result, "Node with key $key should be found")
 				assertEquals(key * 2, result, "For key $key, expected value ${key * 2}")
 			}
