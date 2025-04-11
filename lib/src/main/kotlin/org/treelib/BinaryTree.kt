@@ -49,13 +49,13 @@ abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
 	 * @param start the node from which to start the search (defaults to the root).
 	 * @return the data associated with the node, or null if no such node is found.
 	 */
-	fun search(key: K, start: N? = root): D? {
+	fun search(key: K, start: N? = root): Pair<K, D?>? {
 		var node = start
 		while (node != null) {
 			node = when {
 				key < node.key -> node.left
 				key > node.key -> node.right
-				else -> return node.data
+				else -> return node.key to node.data
 			}
 		}
 		return null
