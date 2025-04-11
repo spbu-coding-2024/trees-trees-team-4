@@ -117,7 +117,7 @@ class BinarySearchTreeTest {
 
     @Test
     fun `balanced inserting`() {
-        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5,5)
+        val tree: BinarySearchTree<Int, Int> = BinarySearchTree(5, 5)
         tree.insert(7, 7)
         tree.insert(8, 8)
         tree.insert(6, 6)
@@ -148,10 +148,9 @@ class BinarySearchTreeTest {
         tree.insert(5, -5)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 5){
+            if (i == 5) {
                 assert(tree.search(i)?.second == -5)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
@@ -172,10 +171,9 @@ class BinarySearchTreeTest {
         tree.insert(2, -2)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 2){
+            if (i == 2) {
                 assert(tree.search(i)?.second == -2)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
@@ -196,10 +194,9 @@ class BinarySearchTreeTest {
         tree.insert(7, -7)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 7){
+            if (i == 7) {
                 assert(tree.search(i)?.second == -7)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
@@ -220,10 +217,9 @@ class BinarySearchTreeTest {
         tree.delete(5)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 5){
+            if (i == 5) {
                 assert(tree.search(i) == null)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
@@ -244,10 +240,9 @@ class BinarySearchTreeTest {
         tree.delete(2)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 2){
+            if (i == 2) {
                 assert(tree.search(i) == null)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
@@ -268,10 +263,9 @@ class BinarySearchTreeTest {
         tree.delete(7)
         assert(tree.isConsistent())
         for (i in 0..9) {
-            if (i == 7){
+            if (i == 7) {
                 assert(tree.search(i) == null)
-            }
-            else {
+            } else {
                 assert(tree.search(i)?.second == i)
             }
         }
