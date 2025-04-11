@@ -3,29 +3,38 @@ package org.treelib
 const val RED = true
 const val BLACK = false
 
-class RBNode<K: Comparable<K>, V : Any>(key: K, data: V): Node<K, V, RBNode<K,V>>(key, data) {
+/**
+ * A Node of Red-Black Tree
+ * @param K the key type
+ * @param D the data value type
+ * @param key a key associated with the tree
+ * @param data a data value associated with the tree
+ */
+class RBNode<K: Comparable<K>, D : Any?>(key: K, data: D?): Node<K, D?, RBNode<K,D?>>(key, data) {
     /**
      * A color of a node.
      */
     var color: Boolean = RED
 }
 /**
- * 
- *
+ * A Red-Black tree then balances itself
+ * @param K the key type
+ * @param D the data value type
+ * @property root the root of a tree
  */
-class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() {
+class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = null):
+    BinaryTree<K, D?, RBNode<K, D?>>() {
 
-    /**
-     * The amount of node in tree.
-     */
-    var size = 0
-        private set
+    init {
+        if (rootKey != null)
+            root = RBNode(rootKey, rootData)
+    }
 
-    private fun isRed(node: RBNode<K, V>?): Boolean {
+    private fun isRed(node: RBNode<K, D?>?): Boolean {
         return node?.color ?: BLACK
     }
 
-    private fun flipColors(node: RBNode<K, V>?) {
+    private fun flipColors(node: RBNode<K, D?>?) {
         checkNotNull(node)
         node.color = !node.color
         node.left?.let {
@@ -36,41 +45,42 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
         }
     }
 
-    private fun balanceNode(node: RBNode<K, V>): RBNode<K, V> {
-        var x = node
-        if (!isRed(x.left) && isRed(x.right)) {
-            x = rotateLeft(x)
+    private fun balanceNode(node: RBNode<K, D?>): RBNode<K, D?> {
+        var current = node
+
+        if (!isRed(current.left) && isRed(current.right)) {
+            current = rotateLeft(current)
         }
-        if (isRed(x.left) && isRed(x.left?.left)) {
-            x = rotateRight(x)
+        if (isRed(current.left) && isRed(current.left?.left)) {
+            current = rotateRight(current)
         }
-        if (isRed(x.left) && isRed(x.right)) {
-            flipColors(x)
+        if (isRed(current.left) && isRed(current.right)) {
+            flipColors(current)
         }
-        return x
+        return current
     }
 
-    private fun rotateLeft(node: RBNode<K, V>): RBNode<K,V> {
-        val x = node.right
-        x?.let {
-            node.right = x.left
-            x.left = node
-            x.color = node.color
+    private fun rotateLeft(node: RBNode<K, D?>): RBNode<K, D?> {
+        val right = node.right
+        right?.let {
+            node.right = it.left
+            it.left = node
+            it.color = node.color
             node.color = RED
-            return x
+            return it
         } ?: let {
             throw NoSuchElementException("Can't rotate left: right node is null")
         }
     }
 
-    private fun rotateRight(node: RBNode<K, V>): RBNode<K,V> {
-        val x = node.left
-        x?.let {
-            node.left = x.right
-            x.right = node
-            x.color = node.color
+    private fun rotateRight(node: RBNode<K, D?>): RBNode<K, D?> {
+        val left = node.left
+        left?.let {
+            node.left = left.right
+            left.right = node
+            left.color = node.color
             node.color = RED
-            return x
+            return left
         } ?: let {
             throw NoSuchElementException("Can't rotate right: left node is null")
         }
@@ -80,161 +90,189 @@ class RedBlackTree<K: Comparable<K>, V : Any>: BinaryTree<K, V, RBNode<K, V>>() 
      * Inserts value with corresponding key.
 
      * If there's no node with the same key in tree, then create new node.
+     *
      * If there's node with same key, then overwrite value of this node.
+     *
      * @param key a key of a node to be inserted
      * @param value a value of a node to be inserted
-     * @return the inserted node
      */
-    override fun insert(key: K, value: V): RBNode<K, V> {
-        var newNode = RBNode<K,V>(key, value)
+    override fun insert(key: K, value: D?) {
+        var newNode = RBNode<K, D?>(key, value)
         root = insert(root, key, value, newNode)
         root?.color = BLACK
-        size++
-        return newNode
     }
 
-    private fun insert(node: RBNode<K, V>?, key: K, value: V, newNode: RBNode<K, V>): RBNode<K, V> {
+    private fun insert(node: RBNode<K, D?>?, key: K, value: D?, newNode: RBNode<K, D?>): RBNode<K, D?> {
         if (node == null) {
             return newNode
         }
-        if (node.key > key) {
-            node.left = insert(node.left, key, value, newNode)
+        when {
+            (node.key > key) -> node.left = insert(node.left, key, value, newNode)
+            (node.key < key) -> node.right = insert(node.right, key, value, newNode)
+            else ->node.data = value
         }
-        else if (node.key < key) {
-            node.right = insert(node.right, key, value, newNode)
-        }
-        else {
-            node.data = value
-        }
-
         return balanceNode(node)
     }
 
-    private fun moveRedLeft(node: RBNode<K, V>): RBNode<K, V> {
+    private fun moveRedLeft(node: RBNode<K, D?>): RBNode<K, D?> {
         require(isRed(node) && !isRed(node.left) && !isRed(node.left?.left))
-        var x = node
-        flipColors(x)
-        x.right?.let {
+        var current = node
+        flipColors(current)
+        current.right?.let {
             if (isRed(it.left)) {
-                x.right = rotateRight(it)
-                x = rotateLeft(x)
-                flipColors(x)
+                current.right = rotateRight(it)
+                current = rotateLeft(current)
+                flipColors(current)
             }
         }
-        return x
+        return current
     }
 
-    private fun moveRedRight(node: RBNode<K, V>): RBNode<K, V> {
+    private fun moveRedRight(node: RBNode<K, D?>): RBNode<K, D?> {
         require(isRed(node) && !isRed(node.right) && !isRed(node.right?.left))
-        var x = node
-        flipColors(x)
-        if (isRed(x.left?.left)) {
-            x = rotateRight(x)
-            flipColors(x)
+        var current = node
+        flipColors(current)
+        if (isRed(current.left?.left)) {
+            current = rotateRight(current)
+            flipColors(current)
         }
-        return x
+        return current
     }
     /**
      * Deletes the minimal element in tree
 
-     * @return the deleted node
+     * @return the deleted data value
      * @throws NoSuchElementException if there's no nodes in tree
      */
-    fun deleteMin(): RBNode<K,V> {
+    fun deleteMin(): D? {
         root?.let {
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
-            var (newRoot, deletedNode) = deleteMin(it)
+            var (newRoot, deletedData) = deleteMin(it)
             root = newRoot
             if (root != null) root?.color = BLACK
-            size--
-            return deletedNode
+            return deletedData
         } ?:
         throw NoSuchElementException("Nothing to delete")
     }
 
-    private fun deleteMin(node: RBNode<K, V>): Pair<RBNode<K, V>?, RBNode<K, V>> {
-        var x = node
+    private fun deleteMin(node: RBNode<K, D?>): Pair<RBNode<K, D?>?, D?> {
+        var current = node
 
-         if (x.left == null) {
-            return Pair(null, node)
+         if (current.left == null) {
+            return Pair(null, node.data)
         }
-        if (!isRed(x.left) && !isRed(x.left?.left)) {
-            x = moveRedLeft(x)
+        if (!isRed(current.left) && !isRed(current.left?.left)) {
+            current = moveRedLeft(current)
         }
-        x.left?.let {
+        current.left?.let {
             var (newLeft, deletedNode) = deleteMin(it)
-            x.left = newLeft
-            return Pair(balanceNode(x), deletedNode)
+            current.left = newLeft
+            return Pair(balanceNode(current), deletedNode)
         } ?: error("deleteMin: left node is null")
     }
 
-    private fun delete(node: RBNode<K, V>, key: K): Pair<RBNode<K, V>?,RBNode<K, V>?> {
-        var x = node
-        var deletedNode: RBNode<K, V>? = null
-        if (key < x.key) {
-            if (!isRed(x.left) && !isRed(x.left?.left)) {
-                x = moveRedLeft(x)
+    private fun delete(node: RBNode<K, D?>, key: K): Pair<RBNode<K, D?>?,D?> {
+        var current = node
+        var deletedData: D? = null
+        if (key < current.key) {
+            if (!isRed(current.left) && !isRed(current.left?.left)) {
+                current = moveRedLeft(current)
             }
-            x.left?.let{
+            current.left?.let{
                 var returnValue = delete(it, key)
-                x.left = returnValue.first
-                deletedNode = returnValue.second
+                current.left = returnValue.first
+                deletedData = returnValue.second
             }
         } else {
-            if (isRed(x.left)) {
-                x = rotateRight(x)
+            if (isRed(current.left)) {
+                current = rotateRight(current)
             }
-            if (key == x.key && x.right == null) {
-                require(isRed(x))
-                return Pair(null, node)
+            if (key == current.key && current.right == null) {
+                require(isRed(current))
+                return Pair(null, node.data)
             }
-            if (!isRed(x.right) && !isRed(x.right?.left)) {
-                x = moveRedRight(x)
+            if (!isRed(current.right) && !isRed(current.right?.left)) {
+                current = moveRedRight(current)
             }
-            if (key == x.key) {
-                val minNode = findMin(x.right)
+            if (key == current.key) {
+                val minNode = getMinNode(current.right)
                 minNode?.let {
-                    x.key = it.key
-                    x.data = it.data
+                    current.key = it.key
+                    current.data = it.data
                 } ?: throw error("delete: findMin returns null")
-                x.right?.let {
+                current.right?.let {
                     var returnValue = deleteMin(it)
-                    x.right = returnValue.first
-                    deletedNode = returnValue.second
+                    current.right = returnValue.first
+                    deletedData = returnValue.second
                 }
             }
             else {
-                x.right?.let {
+                current.right?.let {
                     var returnValue = delete(it, key)
-                    x.right = returnValue.first
-                    deletedNode = returnValue.second
+                    current.right = returnValue.first
+                    deletedData = returnValue.second
                 }
             }
         }
-        return Pair(balanceNode(x), deletedNode)
+        return Pair(balanceNode(current), deletedData)
     }
 
     /**
     * Deletes an element with the given key in tree
     *
     * @param key a key of node to be deleted
-    * @return the deleted node
-    * @throws NoSuchElementException if there's no nodes in tree
+    * @return the deleted data value
+    * @throws NoSuchElementException if there's node to be deleted or tree is empty
     */
-    override fun delete(key: K): RBNode<K, V>? {
+    override fun delete(key: K): D? {
         root?.let {
-            if (search(key) == null) return null
+            if (search(key) == null) throw NoSuchElementException("No such node to be deleted")
             if (!isRed(it.left) && !isRed(it.right)) {
                 it.color = RED
             }
             var (newRoot, deletedNode) = delete(it, key)
             root = newRoot
             if (root != null) root?.color = BLACK
-            size--
             return deletedNode
         } ?:
-        throw NoSuchElementException("Nothing to delete")
+        throw NoSuchElementException("Tree is empty")
+    }
+
+    private fun isBlackBalanced() {
+        if (subtreeBlackCountDifference(root) == -1) {
+            error("Invariant failed: tree is not perfect black balanced")
+        }
+    }
+
+    private fun subtreeBlackCountDifference(node: RBNode<K, D?>?): Int {
+        node?.let {
+            var left = subtreeBlackCountDifference(node.left)
+            var right = subtreeBlackCountDifference(node.right)
+            return if (left == right) {
+                left
+            } else {
+                -1
+            }
+
+        } ?:let {
+            return 1
+        }
+    }
+
+    private fun assertRedLinkAreLeaningLeft(node: RBNode<K, D?>?) {
+        node?.let {
+            if (node.right?.color == RED) {
+                error("Invariant failed: tree is with right leaning red link")
+            }
+            assertRedLinkAreLeaningLeft(node.left)
+            assertRedLinkAreLeaningLeft(node.right)
+        }
+    }
+
+    internal fun checkAll() {
+        assertRedLinkAreLeaningLeft(root)
+        isBlackBalanced()
     }
 }
