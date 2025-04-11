@@ -21,8 +21,7 @@ class BinarySearchTreeTest {
     fun `insert to empty tree`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree()
         tree.insert(0, 0)
-        assert(tree.search(0) == 0)
-        assert(tree.search(0) == 0)
+        assert(tree.search(0)?.second == 0)
         assert(tree.isConsistent())
     }
 
@@ -40,7 +39,7 @@ class BinarySearchTreeTest {
     fun `insert to single node tree (left)`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
         tree.insert(0, 0)
-        assert(tree.search(0) == 0)
+        assert(tree.search(0)?.second == 0)
         assert(tree.isConsistent())
     }
 
@@ -48,7 +47,7 @@ class BinarySearchTreeTest {
     fun `insert to single node tree (right)`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
         tree.insert(2, 2)
-        assert(tree.search(2) == 2)
+        assert(tree.search(2)?.second == 2)
         assert(tree.isConsistent())
     }
 
@@ -56,7 +55,7 @@ class BinarySearchTreeTest {
     fun `insert must update data`() {
         val tree: BinarySearchTree<Int, Int> = BinarySearchTree(1, 1)
         tree.insert(1, 2)
-        assert(tree.search(1) == 2)
+        assert(tree.search(1)?.second == 2)
     }
 
     @Test
@@ -111,7 +110,7 @@ class BinarySearchTreeTest {
             tree.insert(i, i)
         }
         for (i in 9 downTo 0) {
-            assertEquals(i, tree.search(i))
+            assertEquals(i, tree.search(i)?.second)
         }
         assert(tree.findMin() == 0)
     }
@@ -130,7 +129,7 @@ class BinarySearchTreeTest {
         tree.insert(0, 0)
         assert(tree.isConsistent())
         for (i in tree) {
-            assert(tree.search(i.first) == i.second)
+            assert(tree.search(i.first)?.second == i.second)
         }
     }
 
@@ -150,10 +149,10 @@ class BinarySearchTreeTest {
         assert(tree.isConsistent())
         for (i in 0..9) {
             if (i == 5){
-                assert(tree.search(i) == -5)
+                assert(tree.search(i)?.second == -5)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
@@ -174,10 +173,10 @@ class BinarySearchTreeTest {
         assert(tree.isConsistent())
         for (i in 0..9) {
             if (i == 2){
-                assert(tree.search(i) == -2)
+                assert(tree.search(i)?.second == -2)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
@@ -198,10 +197,10 @@ class BinarySearchTreeTest {
         assert(tree.isConsistent())
         for (i in 0..9) {
             if (i == 7){
-                assert(tree.search(i) == -7)
+                assert(tree.search(i)?.second == -7)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
@@ -225,7 +224,7 @@ class BinarySearchTreeTest {
                 assert(tree.search(i) == null)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
@@ -249,7 +248,7 @@ class BinarySearchTreeTest {
                 assert(tree.search(i) == null)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
@@ -273,7 +272,7 @@ class BinarySearchTreeTest {
                 assert(tree.search(i) == null)
             }
             else {
-                assert(tree.search(i) == i)
+                assert(tree.search(i)?.second == i)
             }
         }
     }
