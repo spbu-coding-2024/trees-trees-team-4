@@ -19,7 +19,6 @@ class RedBlackTreeUnitTests {
     @BeforeTest
     fun before() {
         intTree = RedBlackTree<Int, Int>()
-
     }
 
     @Test
@@ -33,13 +32,13 @@ class RedBlackTreeUnitTests {
 
     @Test
     fun `insert 1`() {
-        intTree.insert(1,1)
+        intTree.insert(1, 1)
         assertEquals(intTree.iterator().next().second, 1)
     }
 
     @Test
     fun `insert 2`() {
-        val arr = arrayOf(256 ,247, 257)
+        val arr = arrayOf(256, 247, 257)
         intTree.insert(0, arr[0])
         intTree.insert(1, arr[1])
         intTree.insert(2, arr[2])
@@ -64,9 +63,9 @@ class RedBlackTreeUnitTests {
         intTree.insert(54, 1)
         intTree.insert(23, 2)
         intTree.insert(70, 3)
-        assertEquals(intTree.search(70), 3)
+        assertEquals(intTree.search(70)?.second, 3)
         intTree.insert(70, 10)
-        assertEquals(intTree.search(70), 10)
+        assertEquals(intTree.search(70)?.second, 10)
     }
 
     @Test
@@ -118,7 +117,6 @@ class RedBlackTreeUnitTests {
         } catch (e: NoSuchElementException) {
             assertEquals(e.message, "No such node to be deleted")
         }
-
     }
 
     @Test
@@ -146,7 +144,6 @@ class RedBlackTreeUnitTests {
         intTree.insert(70, 3)
         assertNull(intTree.search(1234))
     }
-
 }
 
 class RedBlackTreePropertyBasedTests {
@@ -178,7 +175,7 @@ class RedBlackTreePropertyBasedTests {
     @RepeatedTest(10)
     fun `Search function test`() {
         for (i in 0..(randomKeys.size - 1)) {
-            var value = randomTree.search(randomKeys[i])
+            val value = randomTree.search(randomKeys[i])?.second
             assertEquals(value, i)
         }
     }
@@ -189,18 +186,18 @@ class RedBlackTreePropertyBasedTests {
         for (key in randomKeys) {
             randomTree.checkAll()
             randomTree.deleteMin()
-            var node = randomTree.search(key)
+            val node = randomTree.search(key)
             assertEquals(node, null)
         }
     }
 
     @RepeatedTest(50)
     fun `Delete Test`() {
-        var indexes = Array<Int>(randomKeys.size) { it }
+        val indexes = Array<Int>(randomKeys.size) { it }
         indexes.shuffle()
         for (i in indexes) {
             randomTree.delete(randomKeys[i])
-            var node = randomTree.search(randomKeys[i])
+            val node = randomTree.search(randomKeys[i])
             assertEquals(node, null)
         }
     }
