@@ -42,11 +42,11 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 		RIGHT_LEFT_HEAVY(-1)
 	}
 
-	private fun rotateHelper(node: AVLNode<K, D?>, child: AVLNode<K, D?>) {
-		node.updateHeight()
-		child.updateHeight()
-		if (root == node)
-			root = child
+	private fun rotateHelper(oldParent: AVLNode<K, D?>, newParent: AVLNode<K, D?>) {
+		oldParent.updateHeight()
+		newParent.updateHeight()
+		if (root == oldParent)
+			root = newParent
 	}
 
 	private fun rotateLeft(node: AVLNode<K, D?>): AVLNode<K, D?> {
@@ -147,6 +147,9 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 	 * @throws NoSuchElementException if a node with the specified key is not found.
 	 */
 	override fun delete(key: K): D? {
+		if (root == null)
+			throw NoSuchElementException("Cannot delete; the tree is empty: key = $key")
+
 		var deletedData: D? = null
 		fun deleteRec(key: K, node: AVLNode<K, D?>?): AVLNode<K, D?>? {
 			when {

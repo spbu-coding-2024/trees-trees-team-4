@@ -146,6 +146,13 @@ class AVLTreeTest {
 	}
 
 	@Test
+	@DisplayName("Delete: empty tree")
+	fun delete_in_empty_tree_returnsNullAndLeavesTreeUnchanged() {
+		val tree = AVLTree<Int, String?>()
+		assertFailsWith<NoSuchElementException> { tree.delete(42) }
+	}
+
+	@Test
 	@DisplayName("Iterator: empty tree")
 	fun iterator_emptyTree() {
 		val tree = AVLTree<Int, String?>()
