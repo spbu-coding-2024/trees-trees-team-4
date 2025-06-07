@@ -89,8 +89,9 @@ class BinarySearchTree<K : Comparable<K>, D : Any>(rootKey: K? = null, rootData:
         var result = false
         val left: BSTNode<K, D?>? = root?.left
         val right: BSTNode<K, D?>? = root?.right
-        if (root == null) result = true
-        else if (left == null && right == null) {
+        if (root == null) {
+            result = true
+        } else if (left == null && right == null) {
             result = true
         } else if (right != null && left != null) {
             result = left.key < root.key && root.key < right.key && isConsistent(right) && isConsistent(left)

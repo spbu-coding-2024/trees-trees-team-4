@@ -9,90 +9,91 @@ package org.treelib
  * @param N the type of node used in the tree.
  */
 abstract class BinaryTree<K : Comparable<K>, D : Any?, N : Node<K, D?, N>> {
-	protected var root: N? = null
-	protected fun getMinNode(start: N? = root): N? {
-		var resultNode = start ?: return null
-		while (true) {
-			resultNode = resultNode.left ?: return resultNode
-		}
-	}
-	protected fun getMaxNode(start: N? = root): N? {
-		var resultNode = start ?: return null
-		while (true) {
-			resultNode = resultNode.right ?: return resultNode
-		}
-	}
-	/**
-	 * Returns the minimum data in the tree starting from the specified node.
-	 *
-	 * @param start the node from which to start the search (defaults to the root).
-	 * @return the minimum data value, or null if the tree is empty.
-	 */
-	fun findMin(start: N? = root): D? {
-		return getMinNode(start)?.data
-	}
+    protected var root: N? = null
+    protected fun getMinNode(start: N? = root): N? {
+        var resultNode = start ?: return null
+        while (true) {
+            resultNode = resultNode.left ?: return resultNode
+        }
+    }
+    protected fun getMaxNode(start: N? = root): N? {
+        var resultNode = start ?: return null
+        while (true) {
+            resultNode = resultNode.right ?: return resultNode
+        }
+    }
 
-	/**
-	 * Returns the maximum data in the tree starting from the specified node.
-	 *
-	 * @param start the node from which to start the search (defaults to the root).
-	 * @return the maximum data value, or null if the tree is empty.
-	 */
-	fun findMax(start: N? = root): D? {
-		return getMaxNode(start)?.data
-	}
+    /**
+     * Returns the minimum data in the tree starting from the specified node.
+     *
+     * @param start the node from which to start the search (defaults to the root).
+     * @return the minimum data value, or null if the tree is empty.
+     */
+    fun findMin(start: N? = root): D? {
+        return getMinNode(start)?.data
+    }
 
-	/**
-	 * Searches for a node with the specified key starting from the given node.
-	 *
-	 * @param key the key to search for.
-	 * @param start the node from which to start the search (defaults to the root).
-	 * @return the data associated with the node, or null if no such node is found.
-	 */
-	fun search(key: K, start: N? = root): Pair<K, D?>? {
-		var node = start
-		while (node != null) {
-			node = when {
-				key < node.key -> node.left
-				key > node.key -> node.right
-				else -> return node.key to node.data
-			}
-		}
-		return null
-	}
+    /**
+     * Returns the maximum data in the tree starting from the specified node.
+     *
+     * @param start the node from which to start the search (defaults to the root).
+     * @return the maximum data value, or null if the tree is empty.
+     */
+    fun findMax(start: N? = root): D? {
+        return getMaxNode(start)?.data
+    }
 
-	/**
-	 * Inserts a new node with the specified key and data into the tree.
-	 * If a node with the same key already exists, its data is updated.
-	 *
-	 * @param key the key of the node to insert.
-	 * @param data the data associated with the key.
-	 */
-	abstract fun insert(key: K, data: D?)
+    /**
+     * Searches for a node with the specified key starting from the given node.
+     *
+     * @param key the key to search for.
+     * @param start the node from which to start the search (defaults to the root).
+     * @return the data associated with the node, or null if no such node is found.
+     */
+    fun search(key: K, start: N? = root): Pair<K, D?>? {
+        var node = start
+        while (node != null) {
+            node = when {
+                key < node.key -> node.left
+                key > node.key -> node.right
+                else -> return node.key to node.data
+            }
+        }
+        return null
+    }
 
-	/**
-	 * Deletes the node with the specified key from the tree.
-	 * If the node is not found, an exception is thrown.
-	 *
-	 * @param key the key of the node to delete.
-	 *
-	 */
-	abstract fun delete(key: K): D?
+    /**
+     * Inserts a new node with the specified key and data into the tree.
+     * If a node with the same key already exists, its data is updated.
+     *
+     * @param key the key of the node to insert.
+     * @param data the data associated with the key.
+     */
+    abstract fun insert(key: K, data: D?)
 
-	/**
-	 * Returns an iterator over the data in the tree in in-order traversal.
-	 *
-	 * @return an iterator over the tree's data.
-	 */
-	operator fun iterator(): Iterator<Pair<K, D?>> = iterator {
-		inorder(root)
-	}
+    /**
+     * Deletes the node with the specified key from the tree.
+     * If the node is not found, an exception is thrown.
+     *
+     * @param key the key of the node to delete.
+     *
+     */
+    abstract fun delete(key: K): D?
 
-	private suspend fun SequenceScope<Pair<K, D?>>.inorder(node: Node<K, D?, N>?) {
-		if (node != null) {
-			inorder(node.left)
-			yield(Pair(node.key, node.data))
-			inorder(node.right)
-		}
-	}
+    /**
+     * Returns an iterator over the data in the tree in in-order traversal.
+     *
+     * @return an iterator over the tree's data.
+     */
+    operator fun iterator(): Iterator<Pair<K, D?>> = iterator {
+        inorder(root)
+    }
+
+    private suspend fun SequenceScope<Pair<K, D?>>.inorder(node: Node<K, D?, N>?) {
+        if (node != null) {
+            inorder(node.left)
+            yield(Pair(node.key, node.data))
+            inorder(node.right)
+        }
+    }
 }

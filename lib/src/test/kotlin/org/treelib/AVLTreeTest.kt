@@ -1,17 +1,17 @@
 package org.treelib
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import kotlin.test.assertFailsWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+import kotlin.test.assertFailsWith
 
 class AVLTreeTest {
 
@@ -239,7 +239,13 @@ class AVLTreeTest {
         tree.insert(0, "zero")
         tree.insert(-1, "minus one")
         listOf(
-            -1 to "minus one", 0 to "zero", 1 to "one", 2 to "two", 3 to "three", 4 to "four", 5 to "five"
+            -1 to "minus one",
+            0 to "zero",
+            1 to "one",
+            2 to "two",
+            3 to "three",
+            4 to "four",
+            5 to "five",
         ).forEach { (key, value) ->
             val found = tree.search(key)
             assertNotNull(found, "Expected to find key $key")
@@ -257,7 +263,7 @@ class AVLTreeTest {
                     listOf(3, 2, 1),
                     listOf(5, 2, 8, 1, 3),
                     (1..20).toList().shuffled(),
-                    (1..100).toList().shuffled()
+                    (1..100).toList().shuffled(),
                 )
             }
         }
@@ -298,7 +304,7 @@ class AVLTreeTest {
                     assertEquals(
                         inOrderKeysAfter.sorted(),
                         inOrderKeysAfter,
-                        "Tree should remain balanced after deleting key $key"
+                        "Tree should remain balanced after deleting key $key",
                     )
                 }
             }

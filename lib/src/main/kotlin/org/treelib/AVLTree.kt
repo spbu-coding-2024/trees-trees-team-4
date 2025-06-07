@@ -30,8 +30,9 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
     BinaryTree<K, D?, AVLNode<K, D?>>() {
 
     init {
-        if (rootKey != null)
+        if (rootKey != null) {
             root = AVLNode(rootKey, rootData)
+        }
     }
 
     enum class Weight(val value: Int) {
@@ -39,14 +40,15 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
         RIGHT_HEAVY(2),
         LEFT_HEAVY(-2),
         LEFT_RIGHT_HEAVY(1),
-        RIGHT_LEFT_HEAVY(-1)
+        RIGHT_LEFT_HEAVY(-1),
     }
 
     private fun rotateHelper(oldParent: AVLNode<K, D?>, newParent: AVLNode<K, D?>) {
         oldParent.updateHeight()
         newParent.updateHeight()
-        if (root == oldParent)
+        if (root == oldParent) {
             root = newParent
+        }
     }
 
     private fun rotateLeft(node: AVLNode<K, D?>): AVLNode<K, D?> {
@@ -89,12 +91,12 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
         if (nodeBalance == Weight.RIGHT_HEAVY && getBalanceFactor(node.right) == Weight.RIGHT_LEFT_HEAVY) {
             node.right = rotateRight(
                 node.right
-                    ?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree")
+                    ?: throw NoSuchElementException("Cannot find right node in right-left-heavy tree"),
             )
         } else if (nodeBalance == Weight.LEFT_HEAVY && getBalanceFactor(node.left) == Weight.LEFT_RIGHT_HEAVY) {
             node.left = rotateLeft(
                 node.left
-                    ?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree")
+                    ?: throw NoSuchElementException("Cannot find left node in left-right-heavy tree"),
             )
         }
 
@@ -147,8 +149,9 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
      * @throws NoSuchElementException if a node with the specified key is not found.
      */
     override fun delete(key: K): D? {
-        if (root == null)
+        if (root == null) {
             throw NoSuchElementException("Cannot delete; the tree is empty: key = $key")
+        }
 
         var deletedData: D? = null
         fun deleteRec(key: K, node: AVLNode<K, D?>?): AVLNode<K, D?>? {
@@ -164,7 +167,7 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
                     val predecessor = getMaxNode(node.left)
                     node.key = predecessor?.key
                         ?: throw NoSuchElementException(
-                            "Cannot find the predecessor of the node to be deleted: key = $key"
+                            "Cannot find the predecessor of the node to be deleted: key = $key",
                         )
                     node.data = predecessor.data
                     node.left = deleteRec(predecessor.key, node.left)
@@ -176,8 +179,10 @@ class AVLTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = nu
 
         if (key == root?.key) {
             root = deleteRec(key, root)
-        } else root?.let {
-            deleteRec(key, it)
+        } else {
+            root?.let {
+                deleteRec(key, it)
+            }
         }
         return deletedData
     }

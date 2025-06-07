@@ -1,9 +1,9 @@
 package org.treelib
 
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Test
 import kotlin.random.Random
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

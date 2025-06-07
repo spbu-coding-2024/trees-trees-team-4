@@ -10,24 +10,26 @@ const val BLACK = false
  * @param key a key associated with the tree
  * @param data a data value associated with the tree
  */
-class RBNode<K: Comparable<K>, D : Any?>(key: K, data: D?): Node<K, D?, RBNode<K,D?>>(key, data) {
+class RBNode<K : Comparable<K>, D : Any?>(key: K, data: D?) : Node<K, D?, RBNode<K, D?>>(key, data) {
     /**
      * A color of a node.
      */
     var color: Boolean = RED
 }
+
 /**
  * A Red-Black tree then balances itself
  * @param K the key type
  * @param D the data value type
  * @property root the root of a tree
  */
-class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = null):
+class RedBlackTree<K : Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? = null) :
     BinaryTree<K, D?, RBNode<K, D?>>() {
 
     init {
-        if (rootKey != null)
+        if (rootKey != null) {
             root = RBNode(rootKey, rootData)
+        }
     }
 
     private fun isRed(node: RBNode<K, D?>?): Boolean {
@@ -109,7 +111,7 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
         when {
             (node.key > key) -> node.left = insert(node.left, key, value, newNode)
             (node.key < key) -> node.right = insert(node.right, key, value, newNode)
-            else ->node.data = value
+            else -> node.data = value
         }
         return balanceNode(node)
     }
@@ -138,6 +140,7 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
         }
         return current
     }
+
     /**
      * Deletes the minimal element in tree
 
@@ -153,14 +156,14 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
             root = newRoot
             if (root != null) root?.color = BLACK
             return deletedData
-        } ?:
-        throw NoSuchElementException("Nothing to delete")
+        }
+            ?: throw NoSuchElementException("Nothing to delete")
     }
 
     private fun deleteMin(node: RBNode<K, D?>): Pair<RBNode<K, D?>?, D?> {
         var current = node
 
-         if (current.left == null) {
+        if (current.left == null) {
             return Pair(null, node.data)
         }
         if (!isRed(current.left) && !isRed(current.left?.left)) {
@@ -173,14 +176,14 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
         } ?: error("deleteMin: left node is null")
     }
 
-    private fun delete(node: RBNode<K, D?>, key: K): Pair<RBNode<K, D?>?,D?> {
+    private fun delete(node: RBNode<K, D?>, key: K): Pair<RBNode<K, D?>?, D?> {
         var current = node
         var deletedData: D? = null
         if (key < current.key) {
             if (!isRed(current.left) && !isRed(current.left?.left)) {
                 current = moveRedLeft(current)
             }
-            current.left?.let{
+            current.left?.let {
                 var returnValue = delete(it, key)
                 current.left = returnValue.first
                 deletedData = returnValue.second
@@ -207,8 +210,7 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
                     current.right = returnValue.first
                     deletedData = returnValue.second
                 }
-            }
-            else {
+            } else {
                 current.right?.let {
                     var returnValue = delete(it, key)
                     current.right = returnValue.first
@@ -220,12 +222,12 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
     }
 
     /**
-    * Deletes an element with the given key in tree
-    *
-    * @param key a key of node to be deleted
-    * @return the deleted data value
-    * @throws NoSuchElementException if there's node to be deleted or tree is empty
-    */
+     * Deletes an element with the given key in tree
+     *
+     * @param key a key of node to be deleted
+     * @return the deleted data value
+     * @throws NoSuchElementException if there's node to be deleted or tree is empty
+     */
     override fun delete(key: K): D? {
         root?.let {
             if (search(key) == null) throw NoSuchElementException("No such node to be deleted")
@@ -236,8 +238,8 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
             root = newRoot
             if (root != null) root?.color = BLACK
             return deletedNode
-        } ?:
-        throw NoSuchElementException("Tree is empty")
+        }
+            ?: throw NoSuchElementException("Tree is empty")
     }
 
     private fun isBlackBalanced() {
@@ -255,8 +257,7 @@ class RedBlackTree<K: Comparable<K>, D : Any?>(rootKey: K? = null, rootData: D? 
             } else {
                 -1
             }
-
-        } ?:let {
+        } ?: let {
             return 1
         }
     }

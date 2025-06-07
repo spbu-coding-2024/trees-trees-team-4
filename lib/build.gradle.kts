@@ -60,7 +60,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.check {
+tasks.named("check") {
     dependsOn(detektTask)
     dependsOn("ktlintFormat")
 }
