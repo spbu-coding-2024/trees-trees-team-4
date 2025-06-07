@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     id("jacoco")
     id("java-library")
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
     id("org.jetbrains.dokka") version "2.0.0"
 }
 
@@ -23,6 +24,16 @@ val detektTask = tasks.register<JavaExec>("detekt") {
     args(params)
 }
 
+ktlint {
+    version.set("0.49.1")
+    debug.set(false)
+    verbose.set(true)
+    android.set(false)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+    enableExperimentalRules.set(false)
+}
+
 dependencies {
     // Use the Kotlin JUnit 5 integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -34,7 +45,7 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-		detekt("io.gitlab.arturbosch.detekt:detekt-cli:1.23.8")
+    detekt("io.gitlab.arturbosch.detekt:detekt-cli:1.23.8")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -50,5 +61,6 @@ tasks.named<Test>("test") {
 }
 
 tasks.check {
-		dependsOn(detektTask)
+    dependsOn(detektTask)
+    dependsOn("ktlintFormat")
 }
